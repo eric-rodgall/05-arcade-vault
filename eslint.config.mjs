@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design prototype (in-browser Babel, global React): reference only.
+    "references/**",
   ]),
 ]);
 

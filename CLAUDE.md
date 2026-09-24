@@ -19,12 +19,16 @@ Next.js 16.3.6 (App Router, `app/` at repo root, no `src/`), React 19, TypeScrip
 
 ## State of the codebase
 
-`app/` is still the untouched create-next-app scaffold (default `page.tsx`, "Create Next App" metadata). The real product has not been ported yet.
+SPEC 01 (`specs/01-mvp-pantallas.md`) ported the five prototype screens to the App Router as a visual-only MVP: no backend and no real games. Data is mocked and the session is simulated in `localStorage`.
 
-`resources/templates/` holds the design prototype to port into Next.js. It is a standalone, in-browser-Babel React app (`Arcade Vault.html` loads the `.jsx` files as globals, with no modules or build step) plus `styles.css` (~950 lines). Structure:
+Routes (UI copy and URLs in Spanish):
 
-- `app.jsx` — root `App`: hash-based router (`route` = `{name, id?}` JSON-encoded in `location.hash`; names: `biblioteca`, `detalle`, `player`, `auth`, `salon`) and `localStorage` persistence (`av_user` for session, `av_scores` for score list).
-- `data.jsx` — shared mock data (`GAMES` etc.); no backend exists yet.
-- `biblioteca.jsx` (library), `detalle.jsx` (game detail), `reproductor.jsx` (player), `salon.jsx` (hall of fame / leaderboard), `auth.jsx`, `nav.jsx` — one screen/component per file.
+- `/` — library (`components/library.tsx`, `components/game-card.tsx`)
+- `/juegos/[id]` — game detail (server component, `generateStaticParams` + `notFound()`)
+- `/juegos/[id]/jugar` — player with simulated score (`components/game-player.tsx`)
+- `/acceso` — login / sign-up / guest (`components/auth-form.tsx`)
+- `/salon` — hall of fame (`components/hall-of-fame.tsx`)
 
-When porting, convert these to App Router routes and components, in TypeScript, rather than copying the global-scope/hash-routing patterns. The templates use suffixed hook aliases (e.g. `useStateApp`) only to avoid global name clashes, which don't apply in modules.
+Shared pieces: `components/nav.tsx` and `components/footer.tsx` (mounted in `app/layout.tsx`), `components/session-provider.tsx` (`useSession()`, key `av_user`), `lib/games.ts` (`GAMES`, `CATS`, `getGame`), `lib/scores.ts` (`seededScores`). The player saves scores to `localStorage` key `av_scores`; nothing reads them back yet.
+
+`references/templates/` holds the original design prototype, kept as visual reference only (excluded from eslint). It is a standalone, in-browser-Babel React app (`Arcade Vault.html` loads the `.jsx` files as globals, with no modules or build step) plus `styles.css`, whose styles now live in `app/globals.css`.
