@@ -1,10 +1,10 @@
 # SPEC 02 — Home de la aplicación y opción «Inicio» en el menú
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-24
 > **Objective:** Crear la pantalla de inicio (landing) de Arcade Vault en `/`, mover la biblioteca a `/biblioteca` y agregar la opción «Inicio» al menú, validando las pantallas nuevas con el MCP de Playwright.
-
+f
 ---
 
 ## Por qué existe este spec
@@ -116,44 +116,44 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` las guías de Se
 
 ### Build y rutas
 
-- [ ] `npm run build` termina sin errores de tipos ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] Las rutas `/`, `/biblioteca`, `/juegos/bloque-buster`, `/juegos/bloque-buster/jugar`, `/acceso` y `/salon` responden 200.
-- [ ] `/acerca` responde 404.
-- [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
+- [x] `npm run build` termina sin errores de tipos ni de compilación.
+- [x] `npm run lint` termina sin errores.
+- [x] Las rutas `/`, `/biblioteca`, `/juegos/bloque-buster`, `/juegos/bloque-buster/jugar`, `/acceso` y `/salon` responden 200.
+- [x] `/acerca` responde 404.
+- [x] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
 
 ### Home (`/`)
 
-- [ ] El hero muestra «INSERTA UNA MONEDA_», las tres líneas «EL ARCADE», «CLÁSICO ESTÁ», «DE VUELTA», y 8 siluetas SVG.
-- [ ] «EXPLORAR JUEGOS» navega a `/biblioteca` y «CREAR CUENTA» a `/acceso`.
-- [ ] La sección `// 01` muestra 4 tarjetas de características con icono.
-- [ ] La sección `// 02` muestra exactamente 6 mini-tarjetas, en el orden de `GAMES`.
-- [ ] Hacer clic en una mini-tarjeta navega a `/juegos/[id]` de ese juego.
-- [ ] «VER TODOS LOS JUEGOS →» navega a `/biblioteca`.
-- [ ] La sección de estadísticas muestra 3 bloques: «12+», «MILES» y «GLOBAL».
-- [ ] «ÚLTIMAS PUNTUACIONES» muestra 7 filas y «TOP JUGADORES · HOY» muestra 5, con NEONFOX en primer lugar y `312.840` como su puntuación.
-- [ ] «VER SALÓN →» navega a `/salon`.
-- [ ] La sección de precios muestra «$0», 6 ventajas y 3 preguntas frecuentes; «EMPEZAR GRATIS →» navega a `/acceso`.
-- [ ] «INSERTAR MONEDA →» navega a `/biblioteca`.
-- [ ] Las secciones con `.reveal` quedan visibles (`.in`) tras hacer scroll hasta ellas.
-- [ ] El pie de página aparece al final del home.
+- [x] El hero muestra «INSERTA UNA MONEDA_», las tres líneas «EL ARCADE», «CLÁSICO ESTÁ», «DE VUELTA», y 8 siluetas SVG.
+- [x] «EXPLORAR JUEGOS» navega a `/biblioteca` y «CREAR CUENTA» a `/acceso`.
+- [x] La sección `// 01` muestra 4 tarjetas de características con icono.
+- [x] La sección `// 02` muestra exactamente 6 mini-tarjetas, en el orden de `GAMES`.
+- [x] Hacer clic en una mini-tarjeta navega a `/juegos/[id]` de ese juego.
+- [x] «VER TODOS LOS JUEGOS →» navega a `/biblioteca`.
+- [x] La sección de estadísticas muestra 3 bloques: «12+», «MILES» y «GLOBAL».
+- [x] «ÚLTIMAS PUNTUACIONES» muestra 7 filas y «TOP JUGADORES · HOY» muestra 5, con NEONFOX en primer lugar y `312.840` como su puntuación.
+- [x] «VER SALÓN →» navega a `/salon`.
+- [x] La sección de precios muestra «$0», 6 ventajas y 3 preguntas frecuentes; «EMPEZAR GRATIS →» navega a `/acceso`.
+- [x] «INSERTAR MONEDA →» navega a `/biblioteca`.
+- [x] Las secciones con `.reveal` quedan visibles (`.in`) tras hacer scroll hasta ellas.
+- [x] El pie de página aparece al final del home.
 
 ### Menú y rutas movidas
 
-- [ ] El nav de escritorio muestra, en este orden, «Inicio», «Biblioteca» y «Salón de la Fama», y no muestra «Acerca de».
-- [ ] El panel móvil muestra las mismas tres opciones más «Iniciar Sesión» (o «Cuenta» con sesión), en ese orden, y no muestra «Acerca de».
-- [ ] En `/` solo «Inicio» está activo; en `/biblioteca` y `/juegos/bloque-buster` solo «Biblioteca»; en `/salon` solo «Salón de la Fama».
-- [ ] El logo navega a `/`.
-- [ ] `/biblioteca` muestra 8 tarjetas con `TODOS` activo; escribir «gl» deja solo GLOTÓN; filtrar por `SHOOTER` deja INVASORES y ROCAS; buscar «zzz» muestra «NO HAY RESULTADOS».
-- [ ] «VOLVER AL VAULT» en `/juegos/[id]` y en el modal del reproductor, y «VOLVER A LA BIBLIOTECA» en `/salon`, navegan a `/biblioteca`.
-- [ ] Tras iniciar sesión o entrar como invitado en `/acceso`, la app navega a `/`.
-- [ ] La sesión persiste al pasar de `/` a `/biblioteca` y tras recargar.
+- [x] El nav de escritorio muestra, en este orden, «Inicio», «Biblioteca» y «Salón de la Fama», y no muestra «Acerca de».
+- [x] El panel móvil muestra las mismas tres opciones más «Iniciar Sesión» (o «Cuenta» con sesión), en ese orden, y no muestra «Acerca de».
+- [x] En `/` solo «Inicio» está activo; en `/biblioteca` y `/juegos/bloque-buster` solo «Biblioteca»; en `/salon` solo «Salón de la Fama».
+- [x] El logo navega a `/`.
+- [x] `/biblioteca` muestra 8 tarjetas con `TODOS` activo; escribir «gl» deja solo GLOTÓN; filtrar por `SHOOTER` deja INVASORES y ROCAS; buscar «zzz» muestra «NO HAY RESULTADOS».
+- [x] «VOLVER AL VAULT» en `/juegos/[id]` y en el modal del reproductor, y «VOLVER A LA BIBLIOTECA» en `/salon`, navegan a `/biblioteca`.
+- [x] Tras iniciar sesión o entrar como invitado en `/acceso`, la app navega a `/`.
+- [x] La sesión persiste al pasar de `/` a `/biblioteca` y tras recargar.
 
 ### Responsive
 
-- [ ] A 375 px de ancho `/` y `/biblioteca` no tienen scroll horizontal.
-- [ ] A 375 px el nav muestra la hamburguesa y el panel móvil abre, muestra «Inicio» y cierra al elegir una opción.
-- [ ] A 375 px las tarjetas de características ocupan una columna y las mini-tarjetas dos.
+- [x] A 375 px de ancho `/` y `/biblioteca` no tienen scroll horizontal.
+- [x] A 375 px el nav muestra la hamburguesa y el panel móvil abre, muestra «Inicio» y cierra al elegir una opción.
+- [x] A 375 px las tarjetas de características ocupan una columna y las mini-tarjetas dos.
 
 ### Cómo se verifica (Playwright MCP)
 
