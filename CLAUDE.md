@@ -19,7 +19,7 @@ Next.js 16.3.6 (App Router, `app/` at repo root, no `src/`), React 19, TypeScrip
 
 ## State of the codebase
 
-SPEC 01 (`specs/01-mvp-pantallas.md`) ported the five prototype screens to the App Router as a visual-only MVP: no backend and no real games. Data is mocked and the session is simulated in `localStorage`. SPEC 02 (`specs/02-home-inicio.md`) added the landing page at `/` and moved the library to `/biblioteca`.
+SPEC 01 (`specs/01-mvp-pantallas.md`) ported the five prototype screens to the App Router as a visual-only MVP: no backend and no real games. Data is mocked and the session is simulated in `localStorage`. SPEC 02 (`specs/02-home-inicio.md`) added the landing page at `/` and moved the library to `/biblioteca`. SPEC 03 (`specs/03-acerca-de-contacto.md`) added the "Acerca de" page at `/acerca` with a contact form that sends real email via Resend.
 
 Routes (UI copy and URLs in Spanish):
 
@@ -29,7 +29,10 @@ Routes (UI copy and URLs in Spanish):
 - `/juegos/[id]/jugar` — player with simulated score (`components/game-player.tsx`)
 - `/acceso` — login / sign-up / guest (`components/auth-form.tsx`)
 - `/salon` — hall of fame (`components/hall-of-fame.tsx`)
+- `/acerca` — about + contact form (`components/about-page.tsx`, a server component; `components/contact-form.tsx` is the only client piece besides `components/reveal.tsx`)
 
-Shared pieces: `components/nav.tsx` and `components/footer.tsx` (mounted in `app/layout.tsx`), `components/session-provider.tsx` (`useSession()`, key `av_user`), `lib/games.ts` (`GAMES`, `CATS`, `getGame`), `lib/scores.ts` (`seededScores`), `lib/home.ts` (static home data: features, stats, recent scores, top players, plan features, FAQs). Home pieces: `components/home-silhouettes.tsx`, `components/feature-icon.tsx`, `components/mini-card.tsx`, `components/reveal.tsx` (adds `.in` via `IntersectionObserver`). The nav lists Inicio · Biblioteca · Salón de la Fama; "Biblioteca" is active on `/biblioteca` and `/juegos/*`. The "back" links (game detail, player modal, hall of fame) point to `/biblioteca`; login/guest still navigates to `/`. The player saves scores to `localStorage` key `av_scores`; nothing reads them back yet.
+Shared pieces: `components/nav.tsx` and `components/footer.tsx` (mounted in `app/layout.tsx`), `components/session-provider.tsx` (`useSession()`, key `av_user`), `lib/games.ts` (`GAMES`, `CATS`, `getGame`), `lib/scores.ts` (`seededScores`), `lib/home.ts` (static home data: features, stats, recent scores, top players, plan features, FAQs). Home pieces: `components/home-silhouettes.tsx`, `components/feature-icon.tsx`, `components/mini-card.tsx`, `components/reveal.tsx` (adds `.in` via `IntersectionObserver`). About pieces: `components/highlight-icon.tsx`, `components/contact-form.tsx` (client, posts to `/api/contacto`). The nav lists Inicio · Biblioteca · Salón de la Fama · Acerca de; "Biblioteca" is active on `/biblioteca` and `/juegos/*`, "Acerca de" on `/acerca`. The "back" links (game detail, player modal, hall of fame) point to `/biblioteca`; login/guest still navigates to `/`. The player saves scores to `localStorage` key `av_scores`; nothing reads them back yet.
+
+The contact form on `/acerca` posts to the Route Handler `app/api/contacto/route.ts`, which sends email through Resend (`resend` package) from `onboarding@resend.dev` to `RESEND_TO_EMAIL`, authenticated with `RESEND_API_KEY`. Both env vars are documented (empty) in `.env.template`, the only `.env*` file committed (see `.gitignore`); real values live only in the untracked `.env.local`. Nothing is persisted server-side — a failed send shows an inline error in the form instead of a false success.
 
 `references/templates/` holds the original design prototype, kept as visual reference only (excluded from eslint). `references/templates/home-about/` is the prototype of the home and about pages; only the home was ported (the about page and the `.gp*` gamepad are out of scope). The prototype is a standalone, in-browser-Babel React app (`Arcade Vault.html` loads the `.jsx` files as globals, with no modules or build step) plus `styles.css`, whose styles now live in `app/globals.css`.

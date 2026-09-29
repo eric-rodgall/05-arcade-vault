@@ -14,6 +14,7 @@ export function Nav() {
   const libraryActive = pathname.startsWith("/biblioteca") || pathname.startsWith("/juegos");
   const hallActive = pathname.startsWith("/salon");
   const authActive = pathname.startsWith("/acceso");
+  const aboutActive = pathname.startsWith("/acerca");
   const close = () => setOpen(false);
 
   return (
@@ -34,6 +35,9 @@ export function Nav() {
           </Link>
           <Link href="/salon" className={hallActive ? "active" : ""}>
             Salón de la Fama
+          </Link>
+          <Link href="/acerca" className={aboutActive ? "active" : ""}>
+            Acerca de
           </Link>
         </div>
         <div className="spacer"></div>
@@ -73,6 +77,9 @@ export function Nav() {
         </Link>
         <Link href="/salon" className={hallActive ? "active" : ""} onClick={close}>
           Salón de la Fama
+        </Link>
+        <Link href="/acerca" className={aboutActive ? "active" : ""} onClick={close}>
+          Acerca de
         </Link>
         <Link href="/acceso" className={authActive ? "active" : ""} onClick={close}>
           {user ? "Cuenta" : "Iniciar Sesión"}
