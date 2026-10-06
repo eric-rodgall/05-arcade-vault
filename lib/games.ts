@@ -1,4 +1,4 @@
-__export type Category = "ARCADE" | "PUZZLE" | "SHOOTER" | "VERSUS";
+export type Category = "ARCADE" | "PUZZLE" | "SHOOTER" | "VERSUS";
 export type Filter = "TODOS" | Category;
 export type AccentColor = "cyan" | "magenta" | "green" | "yellow";
 
