@@ -1,6 +1,6 @@
 # SPEC 05 — Primer juego real: ROCAS (Asteroids)
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-10-06
 > **Objective:** Portar a TypeScript el juego Asteroids de `references/started-games/02-asteroids/` y jugarlo de verdad en `/juegos/rocas/jugar`, conectado al HUD, la pausa y el modal de puntuación de `GamePlayer`.
@@ -106,38 +106,38 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` la guía de Clie
 
 ### Build
 
-- [ ] `npm run build` termina sin errores de tipos ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] `lib/games/asteroids/entities.ts`, `lib/games/asteroids/engine.ts` y `components/asteroids-canvas.tsx` existen.
+- [X] `npm run build` termina sin errores de tipos ni de compilación.
+- [X] `npm run lint` termina sin errores.
+- [X] `lib/games/asteroids/entities.ts`, `lib/games/asteroids/engine.ts` y `components/asteroids-canvas.tsx` existen.
 
 ### Juego
 
-- [ ] `/juegos/rocas/jugar` responde 200 y muestra un `<canvas>` de 800×600 lógicos dentro de `.crt-screen`, sin la arena decorativa `.game-arena`.
-- [ ] Al cargar hay 4 asteroides grandes, la nave en el centro parpadeando (invencible) y 3 vidas en el HUD.
-- [ ] `←` y `→` rotan la nave, `↑` la propulsa y `Espacio` dispara; la página no hace scroll al pulsarlas.
-- [ ] Destruir un asteroide grande suma 20 puntos, uno mediano 50 y uno pequeño 100, y el HUD lo refleja.
-- [ ] Un asteroide grande se divide en dos medianos y uno mediano en dos pequeños; uno pequeño desaparece sin dividirse.
-- [ ] Al chocar con un asteroide fuera de la invencibilidad, el HUD baja una vida y la nave reaparece a los 2 s en el centro.
-- [ ] Al destruir todos los asteroides el nivel del HUD sube de 1 a 2 y aparecen 5 asteroides grandes (`3 + level`).
-- [ ] Al perder la tercera vida se abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD.
-- [ ] Una nave y los asteroides que salen por un borde reaparecen por el opuesto.
+- [X] `/juegos/rocas/jugar` responde 200 y muestra un `<canvas>` de 800×600 lógicos dentro de `.crt-screen`, sin la arena decorativa `.game-arena`.
+- [X] Al cargar hay 4 asteroides grandes, la nave en el centro parpadeando (invencible) y 3 vidas en el HUD.
+- [X] `←` y `→` rotan la nave, `↑` la propulsa y `Espacio` dispara; la página no hace scroll al pulsarlas.
+- [X] Destruir un asteroide grande suma 20 puntos, uno mediano 50 y uno pequeño 100, y el HUD lo refleja.
+- [X] Un asteroide grande se divide en dos medianos y uno mediano en dos pequeños; uno pequeño desaparece sin dividirse.
+- [X] Al chocar con un asteroide fuera de la invencibilidad, el HUD baja una vida y la nave reaparece a los 2 s en el centro.
+- [X] Al destruir todos los asteroides el nivel del HUD sube de 1 a 2 y aparecen 5 asteroides grandes (`3 + level`).
+- [X] Al perder la tercera vida se abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD.
+- [X] Una nave y los asteroides que salen por un borde reaparecen por el opuesto.
 
 ### HUD y flujo
 
-- [ ] PAUSA congela asteroides, nave y balas y muestra «EN PAUSA»; REANUDAR continúa desde el mismo estado.
-- [ ] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado.
-- [ ] «GUARDAR PUNTUACIÓN» agrega `{ game: "rocas", score, name, at }` a `localStorage["av_scores"]`.
-- [ ] Escribir un espacio en el campo de iniciales del modal no dispara ni hace scroll.
-- [ ] «JUGAR DE NUEVO» inicia una partida con puntuación 0, 3 vidas y nivel 1.
-- [ ] Salir de la ruta (SALIR o el nav) y volver no deja dos loops corriendo (la puntuación no avanza más rápido ni se duplican los disparos con una sola pulsación).
-- [ ] El canvas no dibuja HUD propio ni el texto `GAME OVER`.
+- [X] PAUSA congela asteroides, nave y balas y muestra «EN PAUSA»; REANUDAR continúa desde el mismo estado.
+- [X] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado.
+- [X] «GUARDAR PUNTUACIÓN» agrega `{ game: "rocas", score, name, at }` a `localStorage["av_scores"]`.
+- [X] Escribir un espacio en el campo de iniciales del modal no dispara ni hace scroll.
+- [X] «JUGAR DE NUEVO» inicia una partida con puntuación 0, 3 vidas y nivel 1.
+- [X] Salir de la ruta (SALIR o el nav) y volver no deja dos loops corriendo (la puntuación no avanza más rápido ni se duplican los disparos con una sola pulsación).
+- [X] El canvas no dibuja HUD propio ni el texto `GAME OVER`.
 
 ### Sin regresiones
 
-- [ ] `/juegos/caida/jugar` sigue con puntuación simulada, PAUSA, FIN y modal funcionando.
-- [ ] `/`, `/biblioteca`, `/juegos/rocas`, `/acceso`, `/salon` y `/acerca` responden 200.
-- [ ] `/juegos/rocas` muestra el nuevo `long` sin la palabra «OVNIs».
-- [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
+- [X] `/juegos/caida/jugar` sigue con puntuación simulada, PAUSA, FIN y modal funcionando.
+- [X] `/`, `/biblioteca`, `/juegos/rocas`, `/acceso`, `/salon` y `/acerca` responden 200.
+- [X] `/juegos/rocas` muestra el nuevo `long` sin la palabra «OVNIs».
+- [X] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
 
 ### Cómo se verifica (Playwright MCP)
 
