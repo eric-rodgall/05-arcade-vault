@@ -3,7 +3,7 @@ import { FeatureIcon } from "@/components/feature-icon";
 import { HomeSilhouettes } from "@/components/home-silhouettes";
 import { MiniCard } from "@/components/mini-card";
 import { Reveal } from "@/components/reveal";
-import { GAMES } from "@/lib/games";
+import { getGames } from "@/lib/data/games";
 import {
   FAQS,
   FEATURES,
@@ -15,7 +15,9 @@ import {
 
 const TOP_CLASS = ["top1", "top2", "top3"];
 
-export function HomePage() {
+export async function HomePage() {
+  const games = await getGames();
+
   return (
     <div className="home fade-in">
       {/* HERO */}
@@ -80,7 +82,7 @@ export function HomePage() {
           <div className="section-rule"></div>
         </div>
         <div className="mini-rail">
-          {GAMES.slice(0, 6).map((g) => (
+          {games.slice(0, 6).map((g) => (
             <MiniCard key={g.id} game={g} />
           ))}
         </div>

@@ -2,20 +2,20 @@
 
 import { useMemo, useState } from "react";
 import { GameCard } from "@/components/game-card";
-import { CATS, GAMES, type Filter } from "@/lib/games";
+import { CATS, type Filter, type Game } from "@/lib/games";
 
-export function Library() {
+export function Library({ games }: { games: Game[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<Filter>("TODOS");
 
   const filtered = useMemo(
     () =>
-      GAMES.filter(
+      games.filter(
         (g) =>
           (cat === "TODOS" || g.cat === cat) &&
           g.title.toLowerCase().includes(q.toLowerCase()),
       ),
-    [q, cat],
+    [games, q, cat],
   );
 
   return (
