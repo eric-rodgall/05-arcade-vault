@@ -6,22 +6,20 @@ import { AsteroidsCanvas } from "@/components/asteroids-canvas";
 import { useSession } from "@/components/session-provider";
 import type { Game } from "@/lib/games";
 
-const SCORES_KEY = "av_scores";
 const LIVES = 3;
+const MAX_NAME = 10;
 
-interface SavedScore {
-  game: string;
-  score: number;
-  name: string;
-  at: number;
-}
-
-function saveScore(entry: Omit<SavedScore, "at">) {
+async function saveScore(entry: { game: string; score: number; name: string }): Promise<boolean> {
   try {
-    const all: SavedScore[] = JSON.parse(localStorage.getItem(SCORES_KEY) || "[]");
-    all.push({ ...entry, at: Date.now() });
-    localStorage.setItem(SCORES_KEY, JSON.stringify(all));
-  } catch {}
+    const res = await fetch("/api/puntuaciones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 export function GamePlayer({ game }: { game: Game }) {
@@ -34,8 +32,10 @@ export function GamePlayer({ game }: { game: Game }) {
   const [over, setOver] = useState(false);
   const [nameEdit, setNameEdit] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
-  const name = nameEdit ?? user?.name ?? "INVITADO";
+  const name = (nameEdit ?? user?.name ?? "INVITADO").toUpperCase().slice(0, MAX_NAME);
   const isAsteroides = game.id === "asteroides";
   const level = isAsteroides ? engineLevel : Math.floor(score / 2500) + 1;
 
@@ -53,6 +53,17 @@ export function GamePlayer({ game }: { game: Game }) {
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setSaving(false);
+    setSaveError(false);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(false);
+    const ok = await saveScore({ game: game.id, score, name });
+    setSaving(false);
+    if (ok) setSaved(true);
+    else setSaveError(true);
   };
 
   return (
@@ -145,22 +156,25 @@ export function GamePlayer({ game }: { game: Game }) {
               <div className="input-row">
                 <input
                   value={name}
-                  onChange={(e) => setNameEdit(e.target.value.toUpperCase().slice(0, 10))}
+                  onChange={(e) => setNameEdit(e.target.value.toUpperCase().slice(0, MAX_NAME))}
                   placeholder="TUS INICIALES"
                 />
                 <button
                   type="button"
                   className="btn yellow"
-                  onClick={() => {
-                    saveScore({ game: game.id, score, name });
-                    setSaved(true);
-                  }}
+                  onClick={handleSave}
+                  disabled={saving}
                 >
-                  GUARDAR PUNTUACIÓN
+                  {saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
                 </button>
               </div>
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+            )}
+            {saveError && !saved && (
+              <div className="mono" style={{ color: "var(--magenta)", fontSize: 12, marginTop: 12 }}>
+                [ERROR] NO SE PUDO GUARDAR. INTENTA DE NUEVO.
+              </div>
             )}
             <div className="actions">
               <button type="button" className="btn" onClick={restart}>

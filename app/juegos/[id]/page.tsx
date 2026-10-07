@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GAMES, getGame } from "@/lib/games";
+import { getGame } from "@/lib/data/games";
 import { seededScores } from "@/lib/scores";
-
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
-}
 
 export default async function GameDetailPage({
   params,
@@ -13,7 +9,7 @@ export default async function GameDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = getGame(id);
+  const game = await getGame(id);
   if (!game) notFound();
 
   const scores = seededScores(id.length * 17 + 3, 10);
