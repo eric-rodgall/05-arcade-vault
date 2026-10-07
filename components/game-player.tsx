@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AsteroidsCanvas } from "@/components/asteroids-canvas";
 import { useSession } from "@/components/session-provider";
 import type { Game } from "@/lib/games";
 
@@ -26,22 +27,29 @@ function saveScore(entry: Omit<SavedScore, "at">) {
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
   const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(LIVES);
+  const [engineLevel, setEngineLevel] = useState(1);
+  const [runId, setRunId] = useState(0);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   const [nameEdit, setNameEdit] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   const name = nameEdit ?? user?.name ?? "INVITADO";
-  const level = Math.floor(score / 2500) + 1;
+  const isAsteroides = game.id === "asteroides";
+  const level = isAsteroides ? engineLevel : Math.floor(score / 2500) + 1;
 
   useEffect(() => {
-    if (over || paused) return;
+    if (isAsteroides || over || paused) return;
     const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
     return () => clearInterval(t);
-  }, [over, paused]);
+  }, [isAsteroides, over, paused]);
 
   const restart = () => {
     setScore(0);
+    setLives(LIVES);
+    setEngineLevel(1);
+    setRunId((id) => id + 1);
     setPaused(false);
     setOver(false);
     setSaved(false);
@@ -61,7 +69,7 @@ export function GamePlayer({ game }: { game: Game }) {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(LIVES).trim()}</div>
+            <div className="v">{"♥ ".repeat(lives).trim()}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
@@ -83,13 +91,29 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          <div className="game-arena">
-            <div className="grid-floor"></div>
-            <div className="enemy e1"></div>
-            <div className="enemy e2"></div>
-            <div className="enemy e3"></div>
-            <div className="player-ship"></div>
-          </div>
+          {isAsteroides ? (
+            <AsteroidsCanvas
+              key={runId}
+              paused={paused || over}
+              onStats={(stats) => {
+                setScore(stats.score);
+                setLives(stats.lives);
+                setEngineLevel(stats.level);
+              }}
+              onGameOver={(finalScore) => {
+                setScore(finalScore);
+                setOver(true);
+              }}
+            />
+          ) : (
+            <div className="game-arena">
+              <div className="grid-floor"></div>
+              <div className="enemy e1"></div>
+              <div className="enemy e2"></div>
+              <div className="enemy e3"></div>
+              <div className="player-ship"></div>
+            </div>
+          )}
           {paused && (
             <div className="crt-content" style={{ background: "rgba(0,0,0,0.6)", zIndex: 5 }}>
               <div>

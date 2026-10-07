@@ -125,7 +125,7 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` las guías de ro
 - [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
 - [ ] La biblioteca muestra 8 tarjetas con `TODOS` activo.
 - [ ] Escribir "gl" en el buscador deja solo la tarjeta GLOTÓN.
-- [ ] Filtrar por `SHOOTER` deja exactamente INVASORES y ROCAS.
+- [ ] Filtrar por `SHOOTER` deja exactamente INVASORES y ASTEROIDES.
 - [ ] Buscar "zzz" muestra el texto "NO HAY RESULTADOS".
 - [ ] Hacer clic en una tarjeta o en su botón JUGAR navega a `/juegos/[id]`.
 - [ ] El detalle muestra título, descripción larga, etiquetas, estadísticas y 10 filas de puntuaciones.
