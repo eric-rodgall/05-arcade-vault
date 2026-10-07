@@ -157,54 +157,54 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` las guías de re
 
 ### Base de datos
 
-- [ ] `list_tables` (esquema `public`) devuelve `games` y `scores`, ambas con RLS activada, y ninguna tabla llamada `health_check`.
-- [ ] `select count(*) from games` devuelve 8 y `select id from games order by sort_order` devuelve los ids en el orden actual del catálogo, con `asteroides` en sexta posición.
-- [ ] `get_advisors` de seguridad no reporta errores.
-- [ ] Un `insert` en `scores` con la publishable key (cliente `anon`) es rechazado por RLS.
-- [ ] Un `insert` con `score` 0, con `player_name` vacío o de más de 10 caracteres, o con `game_id` inexistente es rechazado por la base de datos.
+- [X] `list_tables` (esquema `public`) devuelve `games` y `scores`, ambas con RLS activada, y ninguna tabla llamada `health_check`.
+- [X] `select count(*) from games` devuelve 8 y `select id from games order by sort_order` devuelve los ids en el orden actual del catálogo, con `asteroides` en sexta posición.
+- [X] `get_advisors` de seguridad no reporta errores.
+- [X] Un `insert` en `scores` con la publishable key (cliente `anon`) es rechazado por RLS.
+- [X] Un `insert` con `score` 0, con `player_name` vacío o de más de 10 caracteres, o con `game_id` inexistente es rechazado por la base de datos.
 - [ ] `supabase/migrations/` contiene la copia de la migración aplicada.
 
 ### Entorno y seguridad
 
-- [ ] `.env.template` contiene `SUPABASE_SECRET_KEY=` sin valor.
-- [ ] `git status` no muestra `.env.local` como archivo a commitear y ningún archivo versionado contiene el valor real de la secret key.
-- [ ] `SUPABASE_SECRET_KEY` solo se referencia en `lib/supabase/admin.ts`, y ese archivo no se importa desde ningún archivo con `"use client"`.
-- [ ] Sin `SUPABASE_SECRET_KEY`, `POST /api/puntuaciones` responde 500 con `{ ok: false, error: "CONFIG_FALTANTE" }`.
+- [X] `.env.template` contiene `SUPABASE_SECRET_KEY=` sin valor.
+- [X] `git status` no muestra `.env.local` como archivo a commitear y ningún archivo versionado contiene el valor real de la secret key.
+- [X] `SUPABASE_SECRET_KEY` solo se referencia en `lib/supabase/admin.ts`, y ese archivo no se importa desde ningún archivo con `"use client"`.
+- [X] Sin `SUPABASE_SECRET_KEY`, `POST /api/puntuaciones` responde 500 con `{ ok: false, error: "CONFIG_FALTANTE" }`.
 
 ### Catálogo
 
-- [ ] `/biblioteca` muestra 8 tarjetas leídas de `games`; filtrar por `SHOOTER` deja INVASORES y ASTEROIDES; buscar «zzz» muestra el estado vacío existente.
-- [ ] `/` muestra los 6 primeros juegos por `sort_order` en «JUEGOS DISPONIBLES AHORA».
-- [ ] `/juegos/asteroides` y `/juegos/asteroides/jugar` responden 200 y `/juegos/no-existe` responde 404.
-- [ ] Ninguna pantalla muestra datos de `lib/games.ts` (el arreglo `GAMES` ya no existe).
+- [X] `/biblioteca` muestra 8 tarjetas leídas de `games`; filtrar por `SHOOTER` deja INVASORES y ASTEROIDES; buscar «zzz» muestra el estado vacío existente.
+- [X] `/` muestra los 6 primeros juegos por `sort_order` en «JUEGOS DISPONIBLES AHORA».
+- [X] `/juegos/asteroides` y `/juegos/asteroides/jugar` responden 200 y `/juegos/no-existe` responde 404.
+- [X] Ninguna pantalla muestra datos de `lib/games.ts` (el arreglo `GAMES` ya no existe).
 
 ### Guardado de puntuaciones
 
 - [ ] `POST /api/puntuaciones` con `{ game: "caida", name: "test", score: 1234 }` responde 200 y la fila aparece en `scores` con `player_name = 'TEST'`.
 - [ ] Con nombre vacío o de 11 caracteres, `score` 0, `score` decimal o fuera de 1..9999999, responde 400 `DATOS_INVALIDOS`.
 - [ ] Con `game: "no-existe"` responde 404 `JUEGO_NO_ENCONTRADO`.
-- [ ] En el modal de fin de partida de `/juegos/caida/jugar`, «GUARDAR PUNTUACIÓN» deshabilita el botón mientras guarda y luego muestra «PUNTUACIÓN GUARDADA_».
-- [ ] Si el `POST` falla (por ejemplo, con `SUPABASE_SECRET_KEY` quitada), el modal muestra un error en línea, el botón sigue disponible y **no** aparece «PUNTUACIÓN GUARDADA_».
-- [ ] Terminar una partida real de `asteroides` y guardar crea una fila con `game_id = 'asteroides'` y la puntuación del HUD.
-- [ ] `localStorage["av_scores"]` no se crea ni se modifica al guardar.
+- [X] En el modal de fin de partida de `/juegos/caida/jugar`, «GUARDAR PUNTUACIÓN» deshabilita el botón mientras guarda y luego muestra «PUNTUACIÓN GUARDADA_».
+- [X] Si el `POST` falla (por ejemplo, con `SUPABASE_SECRET_KEY` quitada), el modal muestra un error en línea, el botón sigue disponible y **no** aparece «PUNTUACIÓN GUARDADA_».
+- [X] Terminar una partida real de `asteroides` y guardar crea una fila con `game_id = 'asteroides'` y la puntuación del HUD.
+- [X] `localStorage["av_scores"]` no se crea ni se modifica al guardar.
 
 ### Salón de la Fama
 
-- [ ] Con `scores` vacía, `/salon` muestra «NADIE HA ENTRADO AL SALÓN TODAVÍA» en cada pestaña, sin podio ni tabla.
-- [ ] Tras guardar 4 puntuaciones distintas de prueba en `caida`, la pestaña CAÍDA muestra el podio con las 3 mejores en orden descendente y una cuarta fila en la tabla con rango `#04`.
-- [ ] A igual puntuación, la fila más antigua aparece primero.
-- [ ] Con sesión iniciada con un nombre que tiene marca en ese juego, aparece «TU MEJOR MARCA» con su puntuación y rango reales; con un nombre sin marca, la fila no aparece; sin sesión, tampoco.
-- [ ] `GET /api/puntuaciones?juego=caida&jugador=TEST` devuelve `{ ok: true, mejor: { rank, score, date } }`, y con un jugador sin marcas devuelve `mejor: null`.
-- [ ] Con las credenciales de Supabase inválidas, `/salon` muestra «NO SE PUDO CARGAR EL RANKING» y ninguna fila inventada.
+- [X] Con `scores` vacía, `/salon` muestra «NADIE HA ENTRADO AL SALÓN TODAVÍA» en cada pestaña, sin podio ni tabla.
+- [X] Tras guardar 4 puntuaciones distintas de prueba en `caida`, la pestaña CAÍDA muestra el podio con las 3 mejores en orden descendente y una cuarta fila en la tabla con rango `#04`.
+- [X] A igual puntuación, la fila más antigua aparece primero.
+- [X] Con sesión iniciada con un nombre que tiene marca en ese juego, aparece «TU MEJOR MARCA» con su puntuación y rango reales; con un nombre sin marca, la fila no aparece; sin sesión, tampoco.
+- [X] `GET /api/puntuaciones?juego=caida&jugador=TEST` devuelve `{ ok: true, mejor: { rank, score, date } }`, y con un jugador sin marcas devuelve `mejor: null`.
+- [X] Con las credenciales de Supabase inválidas, `/salon` muestra «NO SE PUDO CARGAR EL RANKING» y ninguna fila inventada.
 
 ### Build y sin regresiones
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `/`, `/biblioteca`, `/juegos/asteroides`, `/juegos/asteroides/jugar`, `/acceso`, `/salon` y `/acerca` responden 200.
-- [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
-- [ ] `/api/supabase/health` sigue respondiendo 200 `{ ok: true }`.
-- [ ] El inicio de sesión simulado sigue funcionando (`av_user` en `localStorage`).
-- [ ] Al terminar la verificación, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
+- [X] `npm run build` y `npm run lint` terminan sin errores.
+- [X] `/`, `/biblioteca`, `/juegos/asteroides`, `/juegos/asteroides/jugar`, `/acceso`, `/salon` y `/acerca` responden 200.
+- [X] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
+- [X] `/api/supabase/health` sigue respondiendo 200 `{ ok: true }`.
+- [X] El inicio de sesión simulado sigue funcionando (`av_user` en `localStorage`).
+- [X] Al terminar la verificación, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
 
 ### Cómo se verifica (Playwright MCP, curl y MCP de Supabase)
 
