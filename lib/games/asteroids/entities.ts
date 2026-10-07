@@ -1,4 +1,4 @@
-// Entidades de ROCAS (Asteroids), portadas de references/started-games/02-asteroids/game.js.
+// Entidades de ASTEROIDES (Asteroids), portadas de references/started-games/02-asteroids/game.js.
 // Sin React ni DOM: cada `draw` recibe el contexto 2D.
 
 export const W = 800;

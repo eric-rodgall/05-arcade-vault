@@ -1,4 +1,4 @@
-// Motor de ROCAS (Asteroids). Sin React: solo recibe un canvas y callbacks.
+// Motor de ASTEROIDES (Asteroids). Sin React: solo recibe un canvas y callbacks.
 import {
   Asteroid,
   Bullet,

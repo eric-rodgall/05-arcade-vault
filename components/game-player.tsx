@@ -36,14 +36,14 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saved, setSaved] = useState(false);
 
   const name = nameEdit ?? user?.name ?? "INVITADO";
-  const isRocas = game.id === "rocas";
-  const level = isRocas ? engineLevel : Math.floor(score / 2500) + 1;
+  const isAsteroides = game.id === "asteroides";
+  const level = isAsteroides ? engineLevel : Math.floor(score / 2500) + 1;
 
   useEffect(() => {
-    if (isRocas || over || paused) return;
+    if (isAsteroides || over || paused) return;
     const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
     return () => clearInterval(t);
-  }, [isRocas, over, paused]);
+  }, [isAsteroides, over, paused]);
 
   const restart = () => {
     setScore(0);
@@ -91,7 +91,7 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isRocas ? (
+          {isAsteroides ? (
             <AsteroidsCanvas
               key={runId}
               paused={paused || over}

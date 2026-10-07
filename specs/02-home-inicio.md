@@ -144,7 +144,7 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` las guías de Se
 - [x] El panel móvil muestra las mismas tres opciones más «Iniciar Sesión» (o «Cuenta» con sesión), en ese orden, y no muestra «Acerca de».
 - [x] En `/` solo «Inicio» está activo; en `/biblioteca` y `/juegos/bloque-buster` solo «Biblioteca»; en `/salon` solo «Salón de la Fama».
 - [x] El logo navega a `/`.
-- [x] `/biblioteca` muestra 8 tarjetas con `TODOS` activo; escribir «gl» deja solo GLOTÓN; filtrar por `SHOOTER` deja INVASORES y ROCAS; buscar «zzz» muestra «NO HAY RESULTADOS».
+- [x] `/biblioteca` muestra 8 tarjetas con `TODOS` activo; escribir «gl» deja solo GLOTÓN; filtrar por `SHOOTER` deja INVASORES y ASTEROIDES; buscar «zzz» muestra «NO HAY RESULTADOS».
 - [x] «VOLVER AL VAULT» en `/juegos/[id]` y en el modal del reproductor, y «VOLVER A LA BIBLIOTECA» en `/salon`, navegan a `/biblioteca`.
 - [x] Tras iniciar sesión o entrar como invitado en `/acceso`, la app navega a `/`.
 - [x] La sesión persiste al pasar de `/` a `/biblioteca` y tras recargar.
