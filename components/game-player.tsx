@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AsteroidsCanvas } from "@/components/asteroids-canvas";
+import { GAME_ENGINES } from "@/components/game-canvases";
 import { useSession } from "@/components/session-provider";
 import type { Game } from "@/lib/games";
 
@@ -25,7 +25,8 @@ async function saveScore(entry: { game: string; score: number; name: string }): 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
   const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(LIVES);
+  const Engine = GAME_ENGINES[game.id];
+  const [lives, setLives] = useState<number | null>(Engine ? null : LIVES);
   const [engineLevel, setEngineLevel] = useState(1);
   const [runId, setRunId] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -36,18 +37,17 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saveError, setSaveError] = useState(false);
 
   const name = (nameEdit ?? user?.name ?? "INVITADO").toUpperCase().slice(0, MAX_NAME);
-  const isAsteroides = game.id === "asteroides";
-  const level = isAsteroides ? engineLevel : Math.floor(score / 2500) + 1;
+  const level = Engine ? engineLevel : Math.floor(score / 2500) + 1;
 
   useEffect(() => {
-    if (isAsteroides || over || paused) return;
+    if (Engine || over || paused) return;
     const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
     return () => clearInterval(t);
-  }, [isAsteroides, over, paused]);
+  }, [Engine, over, paused]);
 
   const restart = () => {
     setScore(0);
-    setLives(LIVES);
+    setLives(Engine ? null : LIVES);
     setEngineLevel(1);
     setRunId((id) => id + 1);
     setPaused(false);
@@ -80,7 +80,7 @@ export function GamePlayer({ game }: { game: Game }) {
           </div>
           <div className="hud-stat lives">
             <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim()}</div>
+            <div className="v">{lives === null ? "—" : "♥ ".repeat(lives).trim()}</div>
           </div>
           <div className="hud-stat level">
             <div className="l">Nivel</div>
@@ -102,14 +102,14 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isAsteroides ? (
-            <AsteroidsCanvas
+          {Engine ? (
+            <Engine
               key={runId}
               paused={paused || over}
               onStats={(stats) => {
                 setScore(stats.score);
-                setLives(stats.lives);
-                setEngineLevel(stats.level);
+                if (stats.lives !== undefined) setLives(stats.lives);
+                if (stats.level !== undefined) setEngineLevel(stats.level);
               }}
               onGameOver={(finalScore) => {
                 setScore(finalScore);

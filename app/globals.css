@@ -698,6 +698,13 @@ a { color: inherit; text-decoration: none; }
   display: block;
   background: #000;
 }
+.tetris-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
 
 /* fake in-screen game */
 .game-arena {

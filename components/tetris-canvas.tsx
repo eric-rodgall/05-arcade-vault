@@ -3,17 +3,15 @@
 import { useEffect, useRef } from "react";
 import type { EngineProps } from "@/components/game-canvases";
 import {
-  createAsteroidsGame,
-  type AsteroidsGame,
-} from "@/lib/games/asteroids/engine";
+  createTetrisGame,
+  H,
+  W,
+  type TetrisGame,
+} from "@/lib/games/tetris/engine";
 
-export function AsteroidsCanvas({
-  paused,
-  onStats,
-  onGameOver,
-}: EngineProps) {
+export function TetrisCanvas({ paused, onStats, onGameOver }: EngineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gameRef = useRef<AsteroidsGame | null>(null);
+  const gameRef = useRef<TetrisGame | null>(null);
   const pausedRef = useRef(paused);
   const onStatsRef = useRef(onStats);
   const onGameOverRef = useRef(onGameOver);
@@ -27,7 +25,7 @@ export function AsteroidsCanvas({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const game = createAsteroidsGame(canvas, {
+    const game = createTetrisGame(canvas, {
       onStats: (stats) => onStatsRef.current(stats),
       onGameOver: (finalScore) => onGameOverRef.current(finalScore),
     });
@@ -45,11 +43,6 @@ export function AsteroidsCanvas({
   }, [paused]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="asteroids-canvas"
-      width={800}
-      height={600}
-    />
+    <canvas ref={canvasRef} className="tetris-canvas" width={W} height={H} />
   );
 }
