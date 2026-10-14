@@ -122,51 +122,51 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` la guía de Clie
 
 ### Build
 
-- [ ] `npm run build` termina sin errores de tipos ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] Existen `lib/games/snake/fruits.ts`, `lib/games/snake/engine.ts`, `components/snake-canvas.tsx` y `public/games/serpentina/fruits.png`.
-- [ ] `references/` no tiene cambios respecto al estado previo (`git status`).
+- [X] `npm run build` termina sin errores de tipos ni de compilación.
+- [X] `npm run lint` termina sin errores.
+- [X] Existen `lib/games/snake/fruits.ts`, `lib/games/snake/engine.ts`, `components/snake-canvas.tsx` y `public/games/serpentina/fruits.png`.
+- [X] `references/` no tiene cambios respecto al estado previo (`git status`).
 
 ### Catálogo
 
-- [ ] `select title from games where id = 'serpentina'` devuelve `SNAKE` y el `long` ya no menciona «núcleos magenta» ni velocidad creciente.
-- [ ] `/biblioteca`, `/` y `/salon` muestran SNAKE y ninguna pantalla muestra «SERPENTINA».
-- [ ] La URL `/juegos/serpentina` sigue respondiendo 200.
+- [X] `select title from games where id = 'serpentina'` devuelve `SNAKE` y el `long` ya no menciona «núcleos magenta» ni velocidad creciente.
+- [X] `/biblioteca`, `/` y `/salon` muestran SNAKE y ninguna pantalla muestra «SERPENTINA».
+- [X] La URL `/juegos/serpentina` sigue respondiendo 200.
 
 ### Juego
 
-- [ ] `/juegos/serpentina/jugar` responde 200 y muestra un `<canvas>` de 640×480 lógicos dentro de `.crt-screen`, sin `.game-arena`.
-- [ ] Al cargar se ven la serpiente de 3 segmentos avanzando a la derecha y una fruta del atlas en una celda libre.
-- [ ] Las flechas y `WASD` giran la serpiente; invertir 180° no tiene efecto; la página no hace scroll al pulsar flechas.
-- [ ] Dos giros pulsados dentro del mismo paso se aplican en pasos consecutivos (no se pierden).
-- [ ] Comer una fruta suma exactamente 10 puntos, alarga la serpiente un segmento y hace aparecer otra fruta en una celda no ocupada.
-- [ ] Chocar con una pared o con el propio cuerpo abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD.
-- [ ] La velocidad es constante: 8 pasos por segundo medidos en 2 s.
-- [ ] El HUD muestra «—» en Vidas y 01 en Nivel.
-- [ ] El canvas no dibuja puntuación, «PAUSA» ni «GAME OVER».
+- [X] `/juegos/serpentina/jugar` responde 200 y muestra un `<canvas>` de 640×480 lógicos dentro de `.crt-screen`, sin `.game-arena`.
+- [X] Al cargar se ven la serpiente de 3 segmentos avanzando a la derecha y una fruta del atlas en una celda libre.
+- [X] Las flechas y `WASD` giran la serpiente; invertir 180° no tiene efecto; la página no hace scroll al pulsar flechas.
+- [X] Dos giros pulsados dentro del mismo paso se aplican en pasos consecutivos (no se pierden).
+- [X] Comer una fruta suma exactamente 10 puntos, alarga la serpiente un segmento y hace aparecer otra fruta en una celda no ocupada.
+- [X] Chocar con una pared o con el propio cuerpo abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD.
+- [X] La velocidad es constante: 8 pasos por segundo medidos en 2 s.
+- [X] El HUD muestra «—» en Vidas y 01 en Nivel.
+- [X] El canvas no dibuja puntuación, «PAUSA» ni «GAME OVER».
 
 ### HUD y flujo
 
-- [ ] PAUSA congela la serpiente (dos capturas separadas por 1 s idénticas) y muestra «EN PAUSA»; REANUDAR continúa sin saltar celdas.
-- [ ] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado.
-- [ ] Escribir un espacio en el campo de iniciales del modal no dispara nada ni hace scroll.
-- [ ] «JUGAR DE NUEVO» inicia una partida con puntuación 0, serpiente de 3 segmentos y una fruta.
-- [ ] Ir a `/biblioteca` y volver a `/juegos/serpentina/jugar` deja un solo `canvas` y una sola acción por pulsación.
+- [X] PAUSA congela la serpiente (dos capturas separadas por 1 s idénticas) y muestra «EN PAUSA»; REANUDAR continúa sin saltar celdas.
+- [X] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado.
+- [X] Escribir un espacio en el campo de iniciales del modal no dispara nada ni hace scroll.
+- [X] «JUGAR DE NUEVO» inicia una partida con puntuación 0, serpiente de 3 segmentos y una fruta.
+- [X] Ir a `/biblioteca` y volver a `/juegos/serpentina/jugar` deja un solo `canvas` y una sola acción por pulsación.
 
 ### Leaderboard
 
-- [ ] «GUARDAR PUNTUACIÓN» con nombre `TEST1` crea una fila en `scores` con `game_id = 'serpentina'` y la puntuación del HUD (requiere ≥ 10 puntos).
-- [ ] `/salon`, pestaña SNAKE, muestra la fila; con sesión `TEST1` aparece «TU MEJOR MARCA».
-- [ ] `localStorage["av_scores"]` es `null`.
-- [ ] Al terminar, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
+- [X] «GUARDAR PUNTUACIÓN» con nombre `TEST1` crea una fila en `scores` con `game_id = 'serpentina'` y la puntuación del HUD (requiere ≥ 10 puntos).
+- [X] `/salon`, pestaña SNAKE, muestra la fila; con sesión `TEST1` aparece «TU MEJOR MARCA».
+- [X] `localStorage["av_scores"]` es `null`.
+- [X] Al terminar, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
 
 ### Sin regresiones
 
-- [ ] `asteroides`, `caida` y `bloque-buster` siguen funcionando en `/jugar` (canvas, HUD, pausa, FIN).
-- [ ] Un juego simulado (`/juegos/gloton/jugar`) sigue con puntuación simulada, PAUSA, FIN y modal.
-- [ ] `/`, `/biblioteca`, `/juegos/serpentina`, `/acceso`, `/salon` y `/acerca` responden 200.
-- [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
-- [ ] `get_advisors` (security) no reporta errores nuevos.
+- [X] `asteroides`, `caida` y `bloque-buster` siguen funcionando en `/jugar` (canvas, HUD, pausa, FIN).
+- [X] Un juego simulado (`/juegos/gloton/jugar`) sigue con puntuación simulada, PAUSA, FIN y modal.
+- [X] `/`, `/biblioteca`, `/juegos/serpentina`, `/acceso`, `/salon` y `/acerca` responden 200.
+- [X] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
+- [X] `get_advisors` (security) no reporta errores nuevos.
 
 ### Cómo se verifica (Playwright MCP y Supabase MCP)
 
