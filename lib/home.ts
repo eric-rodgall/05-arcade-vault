@@ -53,7 +53,7 @@ export const RECENT_SCORES: RecentScore[] = [
   { player: "Z3R0COOL", game: "Invasores", score: 54190, ago: "hace 8 min", color: "green" },
   { player: "VAULT_07", game: "Asteroides", score: 41200, ago: "hace 12 min", color: "cyan" },
   { player: "GLITCHA", game: "Arkanoid", score: 28450, ago: "hace 18 min", color: "cyan" },
-  { player: "ARKADYA", game: "Serpentina", score: 7820, ago: "hace 24 min", color: "green" },
+  { player: "ARKADYA", game: "Snake", score: 7820, ago: "hace 24 min", color: "green" },
   { player: "CYBER_LU", game: "Ranaria", score: 18900, ago: "hace 31 min", color: "yellow" },
 ];
 
