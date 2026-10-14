@@ -1,6 +1,6 @@
 # SPEC 08 — Tercer juego real: BLOQUE BUSTER (Arkanoid)
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 05, SPEC 06, SPEC 07
 > **Date:** 2026-10-14
 > **Objective:** Portar a TypeScript el Arkanoid de `references/started-games/04-arkanoid/` y jugarlo de verdad en `/juegos/bloque-buster/jugar`, con su puntuación guardada en el leaderboard de `/salon`.
@@ -106,45 +106,45 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` la guía de Clie
 
 ### Build
 
-- [ ] `npm run build` termina sin errores de tipos ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] Existen `lib/games/arkanoid/levels.ts`, `sprites.ts`, `engine.ts`, `components/arkanoid-canvas.tsx` y `public/games/bloque-buster/spritesheet-breakout.png`.
-- [ ] `references/started-games/04-arkanoid/` no tiene cambios (`git status`).
+- [x] `npm run build` termina sin errores de tipos ni de compilación.
+- [x] `npm run lint` termina sin errores.
+- [x] Existen `lib/games/arkanoid/levels.ts`, `sprites.ts`, `engine.ts`, `components/arkanoid-canvas.tsx` y `public/games/bloque-buster/spritesheet-breakout.png`.
+- [x] `references/started-games/04-arkanoid/` no tiene cambios (`git status`).
 
 ### Juego
 
-- [ ] `/juegos/bloque-buster/jugar` responde 200 y muestra un `<canvas>` de 800×600 lógicos dentro de `.crt-screen`, sin `.game-arena`.
-- [ ] Al cargar se ven 60 bloques de colores (nivel 1), la paleta centrada y la pelota subiendo desde ella.
-- [ ] `←` y `→` mueven la paleta; mover el ratón sobre el canvas también; la página no hace scroll al pulsar flechas.
-- [ ] Romper un bloque suma exactamente 10 puntos y dispara la animación de explosión de 4 frames.
-- [ ] Dejar caer la pelota resta una vida (HUD 3 → 2) y recoloca la pelota sobre la paleta.
-- [ ] Al romper todos los bloques el nivel pasa de 01 a 02 con la pirámide de 33 bloques y mayor velocidad (`vy` −330).
-- [ ] Al perder la tercera vida se abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD y vidas en 0.
+- [x] `/juegos/bloque-buster/jugar` responde 200 y muestra un `<canvas>` de 800×600 lógicos dentro de `.crt-screen`, sin `.game-arena`.
+- [x] Al cargar se ven 60 bloques de colores (nivel 1), la paleta centrada y la pelota subiendo desde ella.
+- [x] `←` y `→` mueven la paleta; mover el ratón sobre el canvas también; la página no hace scroll al pulsar flechas.
+- [x] Romper un bloque suma exactamente 10 puntos y dispara la animación de explosión de 4 frames.
+- [x] Dejar caer la pelota resta una vida (HUD 3 → 2) y recoloca la pelota sobre la paleta.
+- [ ] Al romper todos los bloques el nivel pasa de 01 a 02 con la pirámide de 40 bloques y mayor velocidad (`vy` −330).
+- [x] Al perder la tercera vida se abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD y vidas en 0.
 - [ ] Al completar el nivel 5 se abre el modal con la puntuación acumulada (forzable con `browser_evaluate` solo si el motor lo permite; si no, verificarlo por lectura del código).
-- [ ] El canvas no dibuja puntuación, vidas, nivel, «PAUSA», «GAME OVER» ni selector de nivel.
+- [x] El canvas no dibuja puntuación, vidas, nivel, «PAUSA», «GAME OVER» ni selector de nivel.
 
 ### HUD y flujo
 
-- [ ] PAUSA congela pelota y paleta (dos capturas separadas por 1 s idénticas) y muestra «EN PAUSA»; REANUDAR continúa sin salto de la pelota.
-- [ ] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado y al ratón.
-- [ ] Escribir un espacio en el campo de iniciales del modal no dispara nada ni hace scroll.
-- [ ] «JUGAR DE NUEVO» inicia una partida con puntuación 0, 3 vidas, nivel 01 y 60 bloques.
-- [ ] Ir a `/biblioteca` y volver a `/juegos/bloque-buster/jugar` deja un solo `canvas` y una sola acción por pulsación.
+- [x] PAUSA congela pelota y paleta (dos capturas separadas por 1 s idénticas) y muestra «EN PAUSA»; REANUDAR continúa sin salto de la pelota.
+- [x] FIN abre el modal con la puntuación actual y el juego deja de responder al teclado y al ratón.
+- [x] Escribir un espacio en el campo de iniciales del modal no dispara nada ni hace scroll.
+- [x] «JUGAR DE NUEVO» inicia una partida con puntuación 0, 3 vidas, nivel 01 y 60 bloques.
+- [x] Ir a `/biblioteca` y volver a `/juegos/bloque-buster/jugar` deja un solo `canvas` y una sola acción por pulsación.
 
 ### Leaderboard
 
-- [ ] «GUARDAR PUNTUACIÓN» con nombre `TEST1` crea una fila en `scores` con `game_id = 'bloque-buster'` y la puntuación del HUD.
-- [ ] `/salon`, pestaña BLOQUE BUSTER, muestra la fila; con sesión `TEST1` aparece «TU MEJOR MARCA».
-- [ ] `localStorage["av_scores"]` es `null`.
-- [ ] Al terminar, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
+- [x] «GUARDAR PUNTUACIÓN» con nombre `TEST1` crea una fila en `scores` con `game_id = 'bloque-buster'` y la puntuación del HUD.
+- [x] `/salon`, pestaña BLOQUE BUSTER, muestra la fila; con sesión `TEST1` aparece «TU MEJOR MARCA».
+- [x] `localStorage["av_scores"]` es `null`.
+- [x] Al terminar, `select count(*) from scores where player_name like 'TEST%'` devuelve 0.
 
 ### Sin regresiones
 
-- [ ] `/juegos/asteroides/jugar` y `/juegos/caida/jugar` siguen funcionando (canvas, HUD, pausa, FIN, guardado).
-- [ ] Un juego simulado (`/juegos/serpentina/jugar`) sigue con puntuación simulada, PAUSA, FIN y modal.
-- [ ] `/`, `/biblioteca`, `/juegos/bloque-buster`, `/acceso`, `/salon` y `/acerca` responden 200.
-- [ ] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
-- [ ] `get_advisors` (security) no reporta errores nuevos.
+- [x] `/juegos/asteroides/jugar` y `/juegos/caida/jugar` siguen funcionando (canvas, HUD, pausa, FIN, guardado).
+- [x] Un juego simulado (`/juegos/serpentina/jugar`) sigue con puntuación simulada, PAUSA, FIN y modal.
+- [x] `/`, `/biblioteca`, `/juegos/bloque-buster`, `/acceso`, `/salon` y `/acerca` responden 200.
+- [x] Ninguna pantalla muestra errores de hidratación ni errores en la consola del navegador.
+- [x] `get_advisors` (security) no reporta errores nuevos.
 
 ### Cómo se verifica (Playwright MCP y Supabase MCP)
 
