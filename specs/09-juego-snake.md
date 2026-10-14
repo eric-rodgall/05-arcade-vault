@@ -1,6 +1,6 @@
 # SPEC 09 — Cuarto juego real: SNAKE
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 05, SPEC 06, SPEC 07, SPEC 08
 > **Date:** 2026-10-14
 > **Objective:** Crear en TypeScript el juego Snake con los sprites de fruta de `references/source-assets/snake-assets/` y jugarlo en `/juegos/serpentina/jugar`, con su puntuación guardada en el leaderboard de `/salon`.
