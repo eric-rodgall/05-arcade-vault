@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { ArkanoidCanvas } from "@/components/arkanoid-canvas";
 import { AsteroidsCanvas } from "@/components/asteroids-canvas";
+import { SnakeCanvas } from "@/components/snake-canvas";
 import { TetrisCanvas } from "@/components/tetris-canvas";
 
 export interface EngineStats {
@@ -20,4 +21,5 @@ export const GAME_ENGINES: Record<string, ComponentType<EngineProps>> = {
   asteroides: AsteroidsCanvas,
   caida: TetrisCanvas,
   "bloque-buster": ArkanoidCanvas,
+  serpentina: SnakeCanvas,
 };
