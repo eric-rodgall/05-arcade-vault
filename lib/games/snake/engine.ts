@@ -20,8 +20,8 @@ interface Cell {
 const COLS = 16;
 const ROWS = 12;
 const CELL = 40;
-const W = COLS * CELL;
-const H = ROWS * CELL;
+export const W = COLS * CELL;
+export const H = ROWS * CELL;
 const STEP = 0.125; // segundos por paso (8 pasos/s)
 const MAX_DT = 0.05;
 const MAX_STEPS_PER_FRAME = 2;
