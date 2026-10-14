@@ -48,7 +48,7 @@ export const HOME_STATS: HomeStat[] = [
 ];
 
 export const RECENT_SCORES: RecentScore[] = [
-  { player: "NEONFOX", game: "Caída", score: 184220, ago: "hace 2 min", color: "magenta" },
+  { player: "NEONFOX", game: "Tetris", score: 184220, ago: "hace 2 min", color: "magenta" },
   { player: "PX_KAI", game: "Glotón", score: 96400, ago: "hace 5 min", color: "yellow" },
   { player: "Z3R0COOL", game: "Invasores", score: 54190, ago: "hace 8 min", color: "green" },
   { player: "VAULT_07", game: "Asteroides", score: 41200, ago: "hace 12 min", color: "cyan" },

@@ -1,4 +1,4 @@
-// Motor de CAÍDA (Tetris). Sin React: solo recibe un canvas y callbacks.
+// Motor de TETRIS. Sin React: solo recibe un canvas y callbacks.
 import {
   BLOCK,
   COLORS,
