@@ -118,9 +118,9 @@ Antes del paso 1, leer en `node_modules/next/dist/docs/01-app/` la guía de Clie
 - [x] `←` y `→` mueven la paleta; mover el ratón sobre el canvas también; la página no hace scroll al pulsar flechas.
 - [x] Romper un bloque suma exactamente 10 puntos y dispara la animación de explosión de 4 frames.
 - [x] Dejar caer la pelota resta una vida (HUD 3 → 2) y recoloca la pelota sobre la paleta.
-- [ ] Al romper todos los bloques el nivel pasa de 01 a 02 con la pirámide de 40 bloques y mayor velocidad (`vy` −330).
+- [X] Al romper todos los bloques el nivel pasa de 01 a 02 con la pirámide de 40 bloques y mayor velocidad (`vy` −330).
 - [x] Al perder la tercera vida se abre el modal «FIN DEL JUEGO» con la puntuación final igual a la del HUD y vidas en 0.
-- [ ] Al completar el nivel 5 se abre el modal con la puntuación acumulada (forzable con `browser_evaluate` solo si el motor lo permite; si no, verificarlo por lectura del código).
+- [X] Al completar el nivel 5 se abre el modal con la puntuación acumulada (forzable con `browser_evaluate` solo si el motor lo permite; si no, verificarlo por lectura del código).
 - [x] El canvas no dibuja puntuación, vidas, nivel, «PAUSA», «GAME OVER» ni selector de nivel.
 
 ### HUD y flujo

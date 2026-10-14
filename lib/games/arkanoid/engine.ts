@@ -1,4 +1,4 @@
-// Motor de BLOQUE BUSTER (Arkanoid). Sin React: solo recibe un canvas y callbacks.
+// Motor de ARKANOID. Sin React: solo recibe un canvas y callbacks.
 import { LEVELS } from "./levels";
 import {
   BALL_SPRITE,
