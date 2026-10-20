@@ -27,6 +27,10 @@ Skills live in `.agents/skills/` (symlinked from `.claude/skills/`):
 - `/spec-impl` — implement an approved spec step by step.
 - `/add-game` — add a playable game (engine + canvas + `games` row + leaderboard).
 
+Subagents live in `.claude/agents/`:
+
+- `game-planner` — suggests which game to add next; keeps its memory in `.claude/agent-memory/game-planner/` (committed) and maintains `references/geme-suggestions-todo.md`. Never writes code.
+
 ## Specs done
 
 | #   | Spec                            | Result                                                               |
