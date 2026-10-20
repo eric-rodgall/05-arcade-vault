@@ -87,7 +87,7 @@ API (Route Handlers in `app/api/`):
 
 ## Games
 
-Catalog (8 games): `asteroides`, `caida`, `bloque-buster`, `serpentina` are playable; `gloton`, `invasores`, `ranaria`, `duelo-pixel` still produce a simulated score in `.game-arena`. All eight save scores through `POST /api/puntuaciones`.
+Catalog (8 games): `asteroides`, `caida`, `bloque-buster`, `serpentina` are playable, see references/imeplemented-games when you need to check for which games are implemented; `gloton`, `invasores`, `ranaria`, `duelo-pixel` still produce a simulated score in `.game-arena`. All eight save scores through `POST /api/puntuaciones`.
 
 Architecture shared by every real game:
 
