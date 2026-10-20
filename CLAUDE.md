@@ -78,7 +78,7 @@ API (Route Handlers in `app/api/`):
   - `scores` — `id` uuid, `game_id` → `games.id`, `player_name` (1–10 chars, trimmed and uppercased), `score` (1–9 999 999), `created_at`. No `user_id`. Ranking: `score` desc, then `created_at` asc.
 - Pages read through `lib/data/*` with the server client (dynamic because of `cookies()`, no `generateStaticParams`). If Supabase fails, catalog pages throw; there is no mock fallback.
 - No rate limiting on score posts until auth lands. The advisor warnings about `public.rls_auto_enable()` predate SPEC 06 and are left alone.
-- Migrations in `supabase/migrations/`: `games_y_scores` (tables + seed of 8 games), and three title renames (`caida` → TETRIS, `bloque-buster` → ARKANOID, `serpentina` → SNAKE, which also fixes its `long`). Slugs never change. Note: `supabase/migrations/` is in `.gitignore`, so new migrations must be added with `git add -f`.
+- Migrations in `supabase/migrations/`: `games_y_scores` (tables + seed of 8 games), and three title renames (`caida` → TETRIS, `bloque-buster` → ARKANOID, `serpentina` → SNAKE, which also fixes its `long`). Slugs never change. Every migration is committed to git.
 - The Supabase MCP server is configured in `.mcp.json`.
 
 ## Environment
