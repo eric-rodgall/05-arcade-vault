@@ -6,47 +6,107 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Arcade Vault: a web platform to play arcade games online and compete for high scores. The README says the project follows Spec Driven Design (`/spec` and `/spec-impl` workflow), using skills installed via `npx skills@latest add Klerith/fernando-skills`. The UI copy is in Spanish.
+Arcade Vault: a web platform to play arcade games online and compete for high scores. UI copy and URLs are in Spanish. Work follows Spec Driven Design: each feature is a spec in `specs/NN-slug.md` (template and rules in the `/spec` skill), implemented with `/spec-impl` on a `spec-NN-slug` branch (`specs/.spec-config.yml`: `AutoCreateBranch: true`).
+
+## Commands
+
+- `npm run dev` — dev server (http://localhost:3000)
+- `npm run build` / `npm start` — production build / serve
+- `npm run lint` — ESLint (flat config, `eslint.config.mjs`). No test runner. Prettier is configured (`.prettierrc.json`).
 
 ## Stack
 
-Next.js 16.3.6 (App Router, `app/` at repo root, no `src/`), React 19, TypeScript strict, Tailwind CSS v4 (`@import "tailwindcss"` + `@theme inline` in `app/globals.css`, no tailwind config file). Path alias `@/*` maps to the repo root. `app/layout.tsx` uses the `LayoutProps<"/">` global type helper. Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
+Next.js 16.3.6 (App Router, `app/` at repo root, no `src/`), React 19, TypeScript strict, Tailwind CSS v4 (`@import "tailwindcss"` + `@theme inline` in `app/globals.css`, no tailwind config file), Supabase (`@supabase/supabase-js`, `@supabase/ssr`), Resend. Path alias `@/*` → repo root. `app/layout.tsx` uses the `LayoutProps<"/">` global type. Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 
 ## Skills
 
-- Use /frontend-design for create the user interface.
-- /spec
-- /spec-imp
-- /add-game: adds a playable game (engine + canvas + `games` row) with its leaderboard; see `.agents/skills/add-game/`.
+Skills live in `.agents/skills/` (symlinked from `.claude/skills/`):
 
-## State of the codebase
+- `/frontend-design` — use it to build UI.
+- `/spec` — design a spec, section by section.
+- `/spec-impl` — implement an approved spec step by step.
+- `/add-game` — add a playable game (engine + canvas + `games` row + leaderboard).
 
-SPEC 01 (`specs/01-mvp-pantallas.md`) ported the five prototype screens to the App Router as a visual-only MVP: no backend and no real games. Data is mocked and the session is simulated in `localStorage`. SPEC 02 (`specs/02-home-inicio.md`) added the landing page at `/` and moved the library to `/biblioteca`. SPEC 03 (`specs/03-acerca-de-contacto.md`) added the "Acerca de" page at `/acerca` with a contact form that sends real email via Resend. SPEC 04 (`specs/04-conexion-supabase.md`) connected the app to Supabase (client setup and a health check only). SPEC 05 (`specs/05-juego-rocas-asteroids.md`) made `asteroides` the first real, playable game. SPEC 06 (`specs/06-leaderboard-y-tabla-de-juegos.md`) created the `games` and `scores` tables in Supabase: the catalog is read from the database and the hall of fame (`/salon`) shows real scores. SPEC 07 (`specs/07-juego-caida-tetris.md`) made `caida` (Tetris) the second playable game and introduced the engine registry. SPEC 08 (`specs/08-juego-bloque-buster-arkanoid.md`) made `bloque-buster` (Arkanoid) the third playable game. SPEC 09 (`specs/09-juego-snake.md`) made `serpentina` (SNAKE) the fourth playable game.
+## Specs done
 
-Routes (UI copy and URLs in Spanish):
+| #   | Spec                            | Result                                                               |
+| --- | ------------------------------- | -------------------------------------------------------------------- |
+| 01  | `mvp-pantallas`                 | Prototype screens ported to the App Router (visual MVP, mocked data) |
+| 02  | `home-inicio`                   | Landing at `/`; library moved to `/biblioteca`                       |
+| 03  | `acerca-de-contacto`            | `/acerca` with a contact form that sends email via Resend            |
+| 04  | `conexion-supabase`             | Supabase clients + health check                                      |
+| 05  | `juego-rocas-asteroids`         | `asteroides`, first real game                                        |
+| 06  | `leaderboard-y-tabla-de-juegos` | `games` and `scores` tables; catalog and `/salon` read from Supabase |
+| 07  | `juego-caida-tetris`            | `caida` (TETRIS) + engine registry                                   |
+| 08  | `juego-bloque-buster-arkanoid`  | `bloque-buster` (ARKANOID)                                           |
+| 09  | `juego-snake`                   | `serpentina` (SNAKE)                                                 |
 
-- `/` — home / landing (`components/home-page.tsx`, a server component; only `components/reveal.tsx` is a client component)
-- `/biblioteca` — library (`components/library.tsx`, `components/game-card.tsx`)
-- `/juegos/[id]` — game detail (server component, dynamic, `getGame()` + `notFound()`; its "MEJORES PUNTUACIONES" aside still uses `seededScores`)
-- `/juegos/[id]/jugar` — player (`components/game-player.tsx`): real game for `asteroides`, `caida`, `bloque-buster` and `serpentina`, simulated score for the other four
-- `/acceso` — login / sign-up / guest (`components/auth-form.tsx`)
-- `/salon` — hall of fame (`app/salon/page.tsx` server component loads games and the top 12 per game; `components/hall-of-fame.tsx` is the client component with the tabs)
-- `/acerca` — about + contact form (`components/about-page.tsx`, a server component; `components/contact-form.tsx` is the only client piece besides `components/reveal.tsx`)
+## Routes
 
-Shared pieces: `components/nav.tsx` and `components/footer.tsx` (mounted in `app/layout.tsx`), `components/session-provider.tsx` (`useSession()`, key `av_user`), `lib/games.ts` (only the `Game` types and `CATS`; the catalog itself lives in Supabase), `lib/data/games.ts` (`getGames()`, `getGame(id)`), `lib/data/scores.ts` (`getTopScores`, `getPlayerBest`), `lib/scores.ts` (`seededScores`, now used only by the `/juegos/[id]` aside), `lib/home.ts` (static home data: features, stats, recent scores, top players, plan features, FAQs; still mocked). Home pieces: `components/home-silhouettes.tsx`, `components/feature-icon.tsx`, `components/mini-card.tsx`, `components/reveal.tsx` (adds `.in` via `IntersectionObserver`). About pieces: `components/highlight-icon.tsx`, `components/contact-form.tsx` (client, posts to `/api/contacto`). The nav lists Inicio · Biblioteca · Salón de la Fama · Acerca de; "Biblioteca" is active on `/biblioteca` and `/juegos/*`, "Acerca de" on `/acerca`. The "back" links (game detail, player modal, hall of fame) point to `/biblioteca`; login/guest still navigates to `/`. The player saves scores with `POST /api/puntuaciones` for all eight games (the seven non-`asteroides` games still produce a simulated score); `localStorage` key `av_scores` is no longer written.
+| Route                | Files                                                              | Notes                                                                                         |
+| -------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `/`                  | `components/home-page.tsx`                                         | Server component; data mocked in `lib/home.ts`                                                |
+| `/biblioteca`        | `components/library.tsx`, `game-card.tsx`                          | Category filter (`CATS`)                                                                      |
+| `/juegos/[id]`       | `app/juegos/[id]/page.tsx`                                         | `getGame()` + `notFound()`; the "MEJORES PUNTUACIONES" aside still uses mocked `seededScores` |
+| `/juegos/[id]/jugar` | `components/game-player.tsx`                                       | Real engine if registered, simulated score otherwise                                          |
+| `/acceso`            | `components/auth-form.tsx`                                         | Login / sign-up / guest, simulated; navigates to `/`                                          |
+| `/salon`             | `app/salon/page.tsx` + `components/hall-of-fame.tsx` (client tabs) | Top 12 per game; on error shows "NO SE PUDO CARGAR EL RANKING"                                |
+| `/acerca`            | `components/about-page.tsx`, `contact-form.tsx`                    | Posts to `/api/contacto`                                                                      |
 
-Games (SPEC 05): `asteroides` is a port of `references/started-games/02-asteroids/` to TypeScript. `lib/games/asteroids/entities.ts` holds the entity classes (`Bullet`, `Asteroid`, `PowerUp`, `Ship`, `Particle`), utilities and constants; `lib/games/asteroids/engine.ts` exports `createAsteroidsGame(canvas, callbacks)`, a pure engine (no React) that owns state, the `requestAnimationFrame` loop and keyboard handling (←/→ rotate, ↑ thrust, Space fire; ignores `<input>`/`<textarea>`, `preventDefault` only on those four keys). Contract: `AsteroidsCallbacks { onStats({ score, lives, level }), onGameOver(finalScore) }` (`onStats` only fires on changes) and `AsteroidsGame { pause, resume, stop, destroy }`. `components/asteroids-canvas.tsx` (client) mounts an 800×600 `<canvas class="asteroids-canvas">` and calls `destroy()` on cleanup. `GamePlayer` looks up `GAME_ENGINES[game.id]` (registry in `components/game-canvases.tsx`, with the shared `EngineProps { paused, onStats({ score, lives?, level? }), onGameOver }`) and renders it with `key={runId}` (restart remounts), pausing it while paused or while the end modal is open and taking score/lives/level from `onStats`; the canvas draws no HUD or overlays. Games without lives show "—" in the Vidas HUD. The other six games (not in the registry) still use the simulated score and `.game-arena`. New games follow the same pattern: pure engine in `lib/games/<juego>/`, a client canvas component, and one entry in `GAME_ENGINES`.
+API (Route Handlers in `app/api/`):
 
-Games (SPEC 07): `caida` is a port of `references/started-games/03-tetris/`. `lib/games/tetris/pieces.ts` holds the constants (10×20 board, 8 pieces including the "N" nut, `LINE_SCORES`, wall `KICKS`) and pure helpers (`rotateCW`, `collide`, `createBoard`); `lib/games/tetris/engine.ts` exports `createTetrisGame(canvas, callbacks)` with `TetrisCallbacks { onStats({ score, level, lines }), onGameOver(finalScore) }` and `TetrisGame { pause, resume, stop, destroy }` (←/→ move, ↓ soft drop, ↑/X rotate, Space hard drop; no pause key, no theme toggle). `components/tetris-canvas.tsx` mounts a 420×600 canvas (`.tetris-canvas`, `object-fit: contain`): the 300×600 board plus a 120 px column drawing the next piece. The game has no lives. The `caida` row already existed in `games`, so no migration was needed.
+- `POST /api/contacto` — sends email with Resend from `onboarding@resend.dev` to `RESEND_TO_EMAIL`. Nothing is stored; a failure shows an inline error.
+- `POST /api/puntuaciones` — validates and inserts a score (`DATOS_INVALIDOS` 400, `JUEGO_NO_ENCONTRADO` 404, `CONFIG_FALTANTE`/`GUARDADO_FALLIDO` 500).
+- `GET /api/puntuaciones?juego=&jugador=` — `{ ok: true, mejor: { rank, score, date } | null }`.
+- `GET /api/supabase/health` — 200 `{ ok: true }` or 500 `CONFIG_FALTANTE`/`CONEXION_FALLIDA`. It queries the deliberately nonexistent table `health_check` and treats `PGRST205` as success: **never create a table with that name**.
 
-The contact form on `/acerca` posts to the Route Handler `app/api/contacto/route.ts`, which sends email through Resend (`resend` package) from `onboarding@resend.dev` to `RESEND_TO_EMAIL`, authenticated with `RESEND_API_KEY`. Both env vars are documented (empty) in `.env.template`, the only `.env*` file committed (see `.gitignore`); real values live only in the untracked `.env.local`. Nothing is persisted server-side — a failed send shows an inline error in the form instead of a false success.
+## Shared code
 
-Supabase (SPEC 04): `@supabase/supabase-js` and `@supabase/ssr` are dependencies. `lib/supabase/client.ts` exports `createClient()` (browser, `createBrowserClient`) and `lib/supabase/server.ts` exports an **async** `createClient()` (`createServerClient` with `await cookies()` from `next/headers`; call it as `await createClient()`). Both read `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, documented (empty) in `.env.template`. `GET /api/supabase/health` (`app/api/supabase/health/route.ts`) returns 200 `{ ok: true }`, 500 `CONFIG_FALTANTE` when a variable is missing, or 500 `CONEXION_FALLIDA`; it queries the deliberately nonexistent table `health_check` and treats error `PGRST205` as success, so never create a table with that name. The session is still simulated in `localStorage` (`av_user`).
+- Layout: `components/nav.tsx` (Inicio · Biblioteca · Salón de la Fama · Acerca de; "Biblioteca" active on `/biblioteca` and `/juegos/*`) and `components/footer.tsx`, mounted in `app/layout.tsx`. "Back" links point to `/biblioteca`.
+- Session: `components/session-provider.tsx` (`useSession()`), simulated in `localStorage` key `av_user`. There is no real auth yet. `av_scores` is no longer written.
+- `lib/games.ts` — only the `Game` type, `Category`, `AccentColor` and `CATS`; the catalog lives in Supabase.
+- `lib/data/games.ts` (`getGames()`, `getGame(id)`), `lib/data/scores.ts` (`getTopScores`, `getPlayerBest`, `normalizePlayerName`, `MAX_NAME_LENGTH`, `MAX_SCORE`).
+- `lib/scores.ts` (`seededScores`, only for the `/juegos/[id]` aside), `lib/home.ts` (mocked home data).
+- Client components besides the player/canvases: `reveal.tsx` (adds `.in` via `IntersectionObserver`), `contact-form.tsx`, `hall-of-fame.tsx`, `library.tsx`, `game-card.tsx`, `auth-form.tsx`, `session-provider.tsx`, `nav.tsx`. Everything else is a server component.
+- Icons/decoration: `home-silhouettes.tsx`, `feature-icon.tsx`, `highlight-icon.tsx`, `mini-card.tsx`.
 
-Games (SPEC 08): `bloque-buster` is a port of `references/started-games/04-arkanoid/`. `lib/games/arkanoid/levels.ts` holds `LEVELS` (5 levels: 60/40/30/39/39 blocks, ball speed ×1.00–1.46); `lib/games/arkanoid/sprites.ts` holds the spritesheet frame coordinates, `EXPLOSION_DURATION` and `loadSpritesheet()`; `lib/games/arkanoid/engine.ts` exports `createArkanoidGame(canvas, callbacks)` with `ArkanoidCallbacks { onStats({ score, lives, level }), onGameOver(finalScore) }` and `ArkanoidGame { pause, resume, stop, destroy }` (←/→ and mouse move the 81 px paddle; 3 lives, +10 per block). The loop starts only after the spritesheet loads. Both losing the last life and clearing level 5 call `onGameOver`. `components/arkanoid-canvas.tsx` mounts an 800×600 canvas (`.arkanoid-canvas`, `object-fit: contain`). The spritesheet lives in `public/games/bloque-buster/spritesheet-breakout.png` (the only `public/` asset); sound and the level-skip pause overlay were left out. The `bloque-buster` row already existed in `games`, so no migration was needed. Five games were still simulated at that point.
+## Supabase
 
-Games (SPEC 09): `serpentina` (title renamed to SNAKE by migration `supabase/migrations/20261014020000_snake.sql`, which also fixed its `long`; slug unchanged) has no reference project: the rules are the classic Snake. `lib/games/snake/fruits.ts` holds `FRUITS` (22 sprites ported from `references/source-assets/snake-assets/sprites.js`, which is not imported), `FRUIT_SHEET_URL` and `loadFruits()`; `lib/games/snake/engine.ts` exports `createSnakeGame(canvas, callbacks)` with `SnakeCallbacks { onStats({ score }), onGameOver(finalScore) }`, `SnakeGame { pause, resume, stop, destroy }` and `W`/`H` (16×12 grid of 40 px cells, 640×480). Fixed step of 0.125 s (8 steps/s, `dt` ≤ 0.05, max 2 steps per frame), 3 initial segments, +10 per fruit, death on wall or body, no 180° turns, queue of up to 2 turns, filling the grid calls `onGameOver` (win). Controls: arrows and WASD (`preventDefault` only on arrows). The snake is drawn with vector shapes; the fruit is a random atlas sprite, with a magenta circle fallback while the image loads or if it fails (the loop never waits for it). No lives or levels, so the HUD shows "—" and 01. `components/snake-canvas.tsx` mounts a 640×480 canvas (`.snake-canvas`, `object-fit: contain`). The atlas lives in `public/games/serpentina/fruits.png`. Four games are still simulated.
+- Clients: `lib/supabase/client.ts` (browser `createClient()`), `lib/supabase/server.ts` (**async** `createClient()`; use `await createClient()`), `lib/supabase/admin.ts` (`createAdminClient()` with `SUPABASE_SECRET_KEY`, bypasses RLS). Never prefix the secret with `NEXT_PUBLIC_` and never import `admin.ts` from a client component.
+- Tables (RLS on, `SELECT`-only policy for `anon`/`authenticated`; writes only via the admin client):
+  - `games` — `id` (text slug), `title`, `short`, `long`, `cat`, `cover`, `color`, `best`, `plays`, `sort_order`. `best`/`plays` are static seeded figures.
+  - `scores` — `id` uuid, `game_id` → `games.id`, `player_name` (1–10 chars, trimmed and uppercased), `score` (1–9 999 999), `created_at`. No `user_id`. Ranking: `score` desc, then `created_at` asc.
+- Pages read through `lib/data/*` with the server client (dynamic because of `cookies()`, no `generateStaticParams`). If Supabase fails, catalog pages throw; there is no mock fallback.
+- No rate limiting on score posts until auth lands. The advisor warnings about `public.rls_auto_enable()` predate SPEC 06 and are left alone.
+- Migrations in `supabase/migrations/`: `games_y_scores` (tables + seed of 8 games), and three title renames (`caida` → TETRIS, `bloque-buster` → ARKANOID, `serpentina` → SNAKE, which also fixes its `long`). Slugs never change. Every migration is committed to git.
+- The Supabase MCP server is configured in `.mcp.json`.
 
-Supabase data (SPEC 06): the `public` schema has two tables, both with RLS enabled and a `SELECT`-only policy for `anon`/`authenticated` (no insert/update/delete policies). `games` (`id` text slug, `title`, `short`, `long`, `cat`, `cover`, `color`, `best`, `plays`, `sort_order`) holds the eight catalog games; `best` and `plays` are static seeded figures, not derived from `scores`. `scores` (`id` uuid, `game_id` FK to `games.id`, `player_name` 1–10 chars, `score` 1–9999999, `created_at`) has no `user_id` because there is no real auth yet; players are identified only by name. The migration is versioned in `supabase/migrations/`. Pages read through `lib/data/*` with the server client (`cookies()` makes them dynamic, so there is no `generateStaticParams`); if Supabase fails the catalog pages throw and `/salon` shows "NO SE PUDO CARGAR EL RANKING", with no fallback to mock data. Writes go only through `POST /api/puntuaciones` (`app/api/puntuaciones/route.ts`), which validates (`DATOS_INVALIDOS` 400, `JUEGO_NO_ENCONTRADO` 404, `CONFIG_FALTANTE`/`GUARDADO_FALLIDO` 500) and inserts with `createAdminClient()` from `lib/supabase/admin.ts`, which uses `SUPABASE_SECRET_KEY` (server-only, bypasses RLS, documented empty in `.env.template`): never prefix it with `NEXT_PUBLIC_`, and never import `admin.ts` from a client component. `GET /api/puntuaciones?juego=&jugador=` returns the player's real best mark and rank (`{ ok: true, mejor: { rank, score, date } | null }`). Ranking order is `score` descending, then `created_at` ascending. Names are trimmed and uppercased. There is no rate limiting, so anyone can post scores within the valid range until auth lands. The advisor warnings about `public.rls_auto_enable()` predate SPEC 06 and were left alone.
+## Environment
 
-`references/templates/` holds the original design prototype, kept as visual reference only (excluded from eslint). `references/templates/home-about/` is the prototype of the home and about pages; only the home was ported (the about page and the `.gp*` gamepad are out of scope). The prototype is a standalone, in-browser-Babel React app (`Arcade Vault.html` loads the `.jsx` files as globals, with no modules or build step) plus `styles.css`, whose styles now live in `app/globals.css`.
+`.env.template` is the only committed `.env*` file (real values in untracked `.env.local`): `RESEND_API_KEY`, `RESEND_TO_EMAIL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (server only).
+
+## Games
+
+Catalog (8 games): `asteroides`, `caida`, `bloque-buster`, `serpentina` are playable, see references/imeplemented-games when you need to check for which games are implemented; `gloton`, `invasores`, `ranaria`, `duelo-pixel` still produce a simulated score in `.game-arena`. All eight save scores through `POST /api/puntuaciones`.
+
+Architecture shared by every real game:
+
+- Pure engine in `lib/games/<juego>/engine.ts` (no React): `create<Name>Game(canvas, callbacks)` owns the state, the `requestAnimationFrame` loop and keyboard input (ignores `<input>`/`<textarea>`, `preventDefault` only on its own keys). Callbacks `{ onStats(...), onGameOver(finalScore) }` (`onStats` fires only on change); returns `{ pause, resume, stop, destroy }`.
+- Client canvas component in `components/<juego>-canvas.tsx`: mounts a fixed-size `<canvas>` (`object-fit: contain`) and calls `destroy()` on cleanup. The canvas draws no HUD or overlays.
+- Registry `GAME_ENGINES` in `components/game-canvases.tsx` with `EngineProps { paused, onStats({ score, lives?, level? }), onGameOver }`. `GamePlayer` renders the engine with `key={runId}` (restart remounts), pauses it while paused or while the end modal is open, and fills the HUD from `onStats`. Games without lives show "—" in Vidas.
+- New games: follow `/add-game`. Reference sources are in `references/started-games/` and `references/source-assets/` (never imported).
+
+| Slug (title)               | Engine files                                                                                                                              | Canvas                                      | Controls                                           | Rules                                                                                                                                |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `asteroides` (ASTEROIDES)  | `lib/games/asteroids/entities.ts` (Bullet, Asteroid, PowerUp, Ship, Particle), `engine.ts`                                                | 800×600                                     | ←/→ rotate, ↑ thrust, Space fire                   | Lives + levels                                                                                                                       |
+| `caida` (TETRIS)           | `lib/games/tetris/pieces.ts` (10×20 board, 8 pieces incl. "N", `LINE_SCORES`, `KICKS`, `rotateCW`, `collide`, `createBoard`), `engine.ts` | 420×600 (300×600 board + next-piece column) | ←/→ move, ↓ soft drop, ↑/X rotate, Space hard drop | No lives; `onStats({ score, level, lines })`                                                                                         |
+| `bloque-buster` (ARKANOID) | `lib/games/arkanoid/levels.ts` (5 levels), `sprites.ts` (`loadSpritesheet()`), `engine.ts`                                                | 800×600                                     | ←/→ or mouse                                       | 3 lives, +10 per block; loop starts after the spritesheet loads; losing or clearing level 5 ends the game                            |
+| `serpentina` (SNAKE)       | `lib/games/snake/fruits.ts` (22 sprites, `loadFruits()`), `engine.ts`                                                                     | 640×480 (16×12 cells of 40 px)              | Arrows / WASD                                      | Fixed step 0.125 s, +10 per fruit, dies on wall/body, turn queue of 2, filling the grid wins; magenta fallback while the atlas loads |
+
+Assets: `public/games/bloque-buster/spritesheet-breakout.png`, `public/games/serpentina/fruits.png`.
+
+## References
+
+- `references/templates/` — original design prototype (in-browser Babel React + `styles.css`, now in `app/globals.css`). Visual reference only, excluded from ESLint. `references/templates/home-about/` is the home/about prototype; only the home was ported (the about page and the `.gp*` gamepad are out of scope).
+- `references/started-games/` — original JS games ported to TypeScript (`02-asteroids`, `03-tetris`, `04-arkanoid`).
+- `demos/Demo.tsx` is a placeholder; `resources/` holds a sound file not used by the app.
