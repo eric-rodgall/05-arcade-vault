@@ -14,6 +14,8 @@ import {
   rand,
   type Keys,
 } from "./entities";
+import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
+import type { SkinId } from "../skin-ids";
 
 export interface AsteroidsCallbacks {
   onStats: (stats: { score: number; lives: number; level: number }) => void; // al cambiar cualquiera
@@ -23,6 +25,7 @@ export interface AsteroidsCallbacks {
 export interface AsteroidsGame {
   pause(): void;
   resume(): void;
+  setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias; lo llama el cleanup del useEffect
 }
@@ -33,10 +36,13 @@ const GAME_KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "Space"];
 
 export function createAsteroidsGame(
   canvas: HTMLCanvasElement,
-  callbacks: AsteroidsCallbacks
+  callbacks: AsteroidsCallbacks,
+  skinId: SkinId = DEFAULT_SKIN
 ): AsteroidsGame {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
+
+  let skin: SkinDef = SKINS[skinId] ?? SKINS[DEFAULT_SKIN];
 
   // ── Input ───────────────────────────────────────────────────────────────────
   let keys: Keys = {};
@@ -230,14 +236,14 @@ export function createAsteroidsGame(
   // ── Draw (sin HUD ni overlays: los muestra GamePlayer) ──────────────────────
   function draw() {
     if (!ctx) return;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = skin.background;
     ctx.fillRect(0, 0, W, H);
 
-    particles.forEach((p) => p.draw(ctx));
-    asteroids.forEach((a) => a.draw(ctx));
-    powerUps.forEach((p) => p.draw(ctx));
-    bullets.forEach((b) => b.draw(ctx));
-    ship.draw(ctx);
+    particles.forEach((p) => p.draw(ctx, skin));
+    asteroids.forEach((a) => a.draw(ctx, skin));
+    powerUps.forEach((p) => p.draw(ctx, skin));
+    bullets.forEach((b) => b.draw(ctx, skin));
+    ship.draw(ctx, skin);
   }
 
   // ── Loop principal ──────────────────────────────────────────────────────────
@@ -284,6 +290,10 @@ export function createAsteroidsGame(
     },
     resume() {
       start();
+    },
+    setSkin(id: SkinId) {
+      skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
+      draw(); // redibuja también en pausa
     },
     stop() {
       stopped = true;

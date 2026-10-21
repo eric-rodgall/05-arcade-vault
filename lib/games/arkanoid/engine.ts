@@ -10,6 +10,8 @@ import {
   type BlockColor,
   type Frame,
 } from "./sprites";
+import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
+import type { SkinId } from "../skin-ids";
 
 export interface ArkanoidCallbacks {
   onStats: (stats: { score: number; lives: number; level: number }) => void; // solo al cambiar
@@ -21,6 +23,7 @@ export interface ArkanoidGame {
   resume(): void;
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
+  setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
 }
 
 interface Block {
@@ -57,7 +60,8 @@ const GAME_KEYS = ["ArrowLeft", "ArrowRight"];
 
 export function createArkanoidGame(
   canvas: HTMLCanvasElement,
-  callbacks: ArkanoidCallbacks
+  callbacks: ArkanoidCallbacks,
+  skinId: SkinId = DEFAULT_SKIN
 ): ArkanoidGame {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -73,6 +77,7 @@ export function createArkanoidGame(
   let over = false;
   let paused = false;
   let stopped = false;
+  let skin: SkinDef = SKINS[skinId] ?? SKINS[DEFAULT_SKIN];
   let sheet: HTMLImageElement | null = null;
   const keys = { ArrowLeft: false, ArrowRight: false };
 
@@ -206,10 +211,69 @@ export function createArkanoidGame(
     ctx.drawImage(sheet, f.sx, f.sy, f.sw, f.sh, x, y, w, h);
   }
 
+  function drawRect(x: number, y: number, w: number, h: number, color: string) {
+    if (!ctx) return;
+    ctx.fillStyle = color;
+    if (skin.glow) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = skin.glow;
+    }
+    ctx.fillRect(x, y, w, h);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
+  }
+
+  function drawVectorBlock(x: number, y: number, w: number, h: number, color: string) {
+    if (!ctx) return;
+    drawRect(x + 1, y + 1, w - 2, h - 2, color);
+    if (skin.blockBorder) {
+      ctx.strokeStyle = skin.blockBorder;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+    }
+  }
+
+  function drawVectorExplosion(exp: Explosion) {
+    if (!ctx) return;
+    const t = exp.elapsed / EXPLOSION_DURATION;
+    if (skin.explosion === "flash") {
+      // pasos duros: blanco y luego color, sin transparencias
+      const step = Math.min(Math.floor(t * 4), 3);
+      drawVectorBlock(exp.x, exp.y, exp.w, exp.h, step % 2 === 0 ? "#f8f8f8" : skin.blocks[exp.color]);
+      return;
+    }
+    ctx.globalAlpha = Math.max(0, 1 - t);
+    const grow = t * 6;
+    drawRect(exp.x - grow, exp.y - grow, exp.w + grow * 2, exp.h + grow * 2, skin.blocks[exp.color]);
+    ctx.globalAlpha = 1;
+  }
+
   function draw() {
     if (!ctx) return;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = skin.background;
     ctx.fillRect(0, 0, W, H);
+
+    if (!skin.sprites) {
+      for (const b of blocks) {
+        if (b.alive) drawVectorBlock(b.x, b.y, b.w, b.h, skin.blocks[b.color]);
+      }
+      for (const exp of explosions) drawVectorExplosion(exp);
+      drawRect(paddle.x, paddle.y, paddle.w, paddle.h, skin.paddle);
+      if (skin.roundBall) {
+        ctx.fillStyle = skin.ball;
+        ctx.shadowColor = skin.ball;
+        ctx.shadowBlur = skin.glow;
+        ctx.beginPath();
+        ctx.arc(ball.x + ball.w / 2, ball.y + ball.h / 2, ball.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = "transparent";
+      } else {
+        drawRect(ball.x, ball.y, ball.w, ball.h, skin.ball);
+      }
+      return;
+    }
+
     if (!sheet) return;
 
     for (const b of blocks) {
@@ -301,6 +365,10 @@ export function createArkanoidGame(
       if (!paused) return;
       paused = false;
       startLoop();
+    },
+    setSkin(id: SkinId) {
+      skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
+      if (!stopped) draw();
     },
     stop() {
       stopped = true;

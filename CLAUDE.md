@@ -27,6 +27,12 @@ Skills live in `.agents/skills/` (symlinked from `.claude/skills/`):
 - `/spec-impl` — implement an approved spec step by step.
 - `/add-game` — add a playable game (engine + canvas + `games` row + leaderboard).
 
+Subagents live in `.claude/agents/`:
+
+- `game-planner` — suggests which game to add next; keeps its memory in `.claude/agent-memory/game-planner/` (committed) and maintains `references/geme-suggestions-todo.md`. Never writes code.
+- `game-jam` — receives a THEME and writes specs (never code) for new arcade games in `specs/game-jam/<game-id>/` (`01-diseno-juego.md`, `02-motor-y-canvas.md`), all in `Draft` for review before `/spec-impl`. It can also be asked for a single game, e.g. `invasores` (specs written, not implemented).
+- `skin-designer` — takes a game slug (or "todos") and makes sure it has at least 3 skins: `clasico` (default, current look), `neon` and `retro`, all readable on dark backgrounds. For implemented games it edits the engine/canvas/`GamePlayer` (skin passed to the engine as data, selector in the UI, `localStorage` key `av_skin_<slug>`) and runs lint/build; for specified-only games it only writes the report. Reports go in `specs/skins/<game-id>.md`. No game has skins yet (TETRIS is the first to migrate); it does not edit `CLAUDE.md` or commit.
+
 ## Specs done
 
 | #   | Spec                            | Result                                                               |

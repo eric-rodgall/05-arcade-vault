@@ -1,5 +1,7 @@
 // Entidades de ASTEROIDES (Asteroids), portadas de references/started-games/02-asteroids/game.js.
-// Sin React ni DOM: cada `draw` recibe el contexto 2D.
+// Sin React ni DOM: cada `draw` recibe el contexto 2D y el skin activo.
+
+import type { SkinDef } from "./skins";
 
 export const W = 800;
 export const H = 600;
@@ -53,11 +55,14 @@ export class Bullet {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = "#fff";
+  draw(ctx: CanvasRenderingContext2D, skin: SkinDef): void {
+    ctx.fillStyle = skin.bullet;
+    ctx.shadowColor = skin.bullet;
+    ctx.shadowBlur = skin.glow;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -110,13 +115,15 @@ export class Asteroid {
     ];
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
+  draw(ctx: CanvasRenderingContext2D, skin: SkinDef): void {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rot);
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = "round";
+    ctx.strokeStyle = skin.asteroid;
+    ctx.shadowColor = skin.asteroid;
+    ctx.shadowBlur = skin.glow;
+    ctx.lineWidth = skin.lineWidth;
+    ctx.lineJoin = skin.lineJoin;
     ctx.beginPath();
     ctx.moveTo(this.verts[0][0], this.verts[0][1]);
     for (let i = 1; i < this.verts.length; i++)
@@ -153,18 +160,20 @@ export class PowerUp {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
+  draw(ctx: CanvasRenderingContext2D, skin: SkinDef): void {
     if (this.ttl < 2 && Math.floor(this.ttl * 8) % 2 === 0) return;
     const pulse = 0.85 + Math.sin(performance.now() / 150) * 0.15;
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(Math.PI / 4);
-    ctx.strokeStyle = "#0ff";
+    ctx.strokeStyle = skin.powerUp;
+    ctx.shadowColor = skin.powerUp;
+    ctx.shadowBlur = skin.glow;
     ctx.lineWidth = 2;
     const r = this.radius * pulse;
     ctx.strokeRect(-r, -r, r * 2, r * 2);
     ctx.restore();
-    ctx.fillStyle = "#0ff";
+    ctx.fillStyle = skin.powerUp;
     ctx.font = "bold 12px monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -240,7 +249,7 @@ export class Ship {
     return [new Bullet(ox, oy, this.angle)];
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
+  draw(ctx: CanvasRenderingContext2D, skin: SkinDef): void {
     if (this.dead) return;
     // Parpadeo durante invencibilidad de reaparición
     if (this.invincible > 0 && Math.floor(this.invincible * 8) % 2 === 0)
@@ -249,9 +258,11 @@ export class Ship {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = "round";
+    ctx.strokeStyle = skin.ship;
+    ctx.shadowColor = skin.ship;
+    ctx.shadowBlur = skin.glow;
+    ctx.lineWidth = skin.lineWidth;
+    ctx.lineJoin = skin.lineJoin;
 
     // Silueta clásica: triángulo con muesca trasera
     ctx.beginPath();
@@ -268,7 +279,8 @@ export class Ship {
       ctx.moveTo(-8, -4);
       ctx.lineTo(-8 - rand(6, 14), 0);
       ctx.lineTo(-8, 4);
-      ctx.strokeStyle = "rgba(255, 130, 0, 0.85)";
+      ctx.strokeStyle = skin.flame;
+      ctx.shadowColor = skin.flame;
       ctx.stroke();
     }
 
@@ -304,9 +316,11 @@ export class Particle {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    const alpha = this.ttl / this.life;
-    ctx.strokeStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+  draw(ctx: CanvasRenderingContext2D, skin: SkinDef): void {
+    const alpha = skin.fade ? this.ttl / this.life : 1;
+    ctx.strokeStyle = `rgba(${skin.particle},${alpha.toFixed(2)})`;
+    ctx.shadowColor = `rgb(${skin.particle})`;
+    ctx.shadowBlur = skin.glow;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
