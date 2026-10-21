@@ -1,7 +1,6 @@
 // Motor de TETRIS. Sin React: solo recibe un canvas y callbacks.
 import {
   BLOCK,
-  COLORS,
   COLS,
   KICKS,
   LINE_SCORES,
@@ -13,6 +12,8 @@ import {
   type Board,
   type Shape,
 } from "./pieces";
+import { SKINS, DEFAULT_SKIN, type SkinDef } from "./skins";
+import type { SkinId } from "../skin-ids";
 
 export interface TetrisCallbacks {
   onStats: (stats: { score: number; level: number; lines: number }) => void; // solo al cambiar
@@ -24,6 +25,7 @@ export interface TetrisGame {
   resume(): void;
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
+  setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
 }
 
 interface Piece {
@@ -38,7 +40,6 @@ export const W = 420;
 export const H = 600;
 const BOARD_W = COLS * BLOCK;
 const NEXT_BLOCK = 30;
-const GRID_COLOR = "rgba(255,255,255,0.07)";
 const GAME_KEYS = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space"];
 
 function randomPiece(): Piece {
@@ -54,7 +55,8 @@ function randomPiece(): Piece {
 
 export function createTetrisGame(
   canvas: HTMLCanvasElement,
-  callbacks: TetrisCallbacks
+  callbacks: TetrisCallbacks,
+  skinId: SkinId = DEFAULT_SKIN
 ): TetrisGame {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -70,6 +72,8 @@ export function createTetrisGame(
   let dropAccum = 0;
   let over = false;
   let paused = false;
+  let destroyed = false;
+  let skin: SkinDef = SKINS[skinId] ?? SKINS[DEFAULT_SKIN];
 
   let lastEmitted = "";
   function emitStats() {
@@ -197,20 +201,45 @@ export function createTetrisGame(
     y: number,
     colorIndex: number,
     size: number,
-    alpha = 1
+    ghost = false
   ) {
     if (!ctx || !colorIndex) return;
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = COLORS[colorIndex] as string;
-    ctx.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-    ctx.fillStyle = "rgba(255,255,255,0.12)";
-    ctx.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+    const color = skin.colors[colorIndex] as string;
+    const px = x * size + 1;
+    const py = y * size + 1;
+    const s = size - 2;
+    if (ghost && skin.ghost === "outline") {
+      ctx.globalAlpha = skin.ghostAlpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px + 1, py + 1, s - 2, s - 2);
+      ctx.globalAlpha = 1;
+      return;
+    }
+    ctx.globalAlpha = ghost ? skin.ghostAlpha : 1;
+    ctx.fillStyle = color;
+    if (skin.glow && !ghost) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = skin.glow;
+    }
+    ctx.fillRect(px, py, s, s);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
+    if (skin.border && !ghost) {
+      ctx.strokeStyle = skin.border;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px + 1, py + 1, s - 2, s - 2);
+    }
+    if (skin.bevel) {
+      ctx.fillStyle = skin.bevel;
+      ctx.fillRect(px, py, s, 4);
+    }
     ctx.globalAlpha = 1;
   }
 
   function drawGrid(c: CanvasRenderingContext2D) {
-    c.strokeStyle = GRID_COLOR;
-    c.lineWidth = 0.5;
+    c.strokeStyle = skin.grid;
+    c.lineWidth = skin.gridWidth;
     for (let col = 1; col < COLS; col++) {
       c.beginPath();
       c.moveTo(col * BLOCK, 0);
@@ -239,12 +268,12 @@ export function createTetrisGame(
 
   function draw() {
     if (!ctx) return;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = skin.background;
     ctx.fillRect(0, 0, W, H);
     drawGrid(ctx);
 
     // separador del panel «siguiente»
-    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.strokeStyle = skin.separator;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(BOARD_W + 0.5, 0);
@@ -258,7 +287,7 @@ export function createTetrisGame(
     for (let r = 0; r < current.shape.length; r++)
       for (let c = 0; c < current.shape[r].length; c++)
         if (current.shape[r][c])
-          drawBlock(current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
+          drawBlock(current.x + c, gy + r, current.shape[r][c], BLOCK, true);
 
     for (let r = 0; r < current.shape.length; r++)
       for (let c = 0; c < current.shape[r].length; c++)
@@ -324,6 +353,10 @@ export function createTetrisGame(
       paused = false;
       start();
     },
+    setSkin(id: SkinId) {
+      skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
+      if (!destroyed) draw();
+    },
     stop() {
       stopped = true;
       halt();
@@ -331,6 +364,7 @@ export function createTetrisGame(
     },
     destroy() {
       this.stop();
+      destroyed = true;
       board = [];
     },
   };

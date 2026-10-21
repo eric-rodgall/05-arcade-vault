@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { GAME_ENGINES } from "@/components/game-canvases";
+import { GAME_ENGINES, SKIN_GAMES } from "@/components/game-canvases";
 import { useSession } from "@/components/session-provider";
 import type { Game } from "@/lib/games";
+import { DEFAULT_SKIN, SKIN_IDS, SKIN_NAMES, isSkinId, type SkinId } from "@/lib/games/skin-ids";
 
 const LIVES = 3;
 const MAX_NAME = 10;
@@ -35,6 +36,30 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
+
+  const hasSkins = SKIN_GAMES.has(game.id);
+  const [skin, setSkin] = useState<SkinId>(DEFAULT_SKIN);
+
+  // Lee la preferencia en el cliente (no en el render) para no romper la hidratación.
+  useEffect(() => {
+    if (!hasSkins) return;
+    try {
+      const saved = localStorage.getItem(`av_skin_${game.id}`);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (isSkinId(saved)) setSkin(saved);
+    } catch {
+      /* localStorage no disponible: se queda en clasico */
+    }
+  }, [hasSkins, game.id]);
+
+  const chooseSkin = (id: SkinId) => {
+    setSkin(id);
+    try {
+      localStorage.setItem(`av_skin_${game.id}`, id);
+    } catch {
+      /* sin persistencia */
+    }
+  };
 
   const name = (nameEdit ?? user?.name ?? "INVITADO").toUpperCase().slice(0, MAX_NAME);
   const level = Engine ? engineLevel : Math.floor(score / 2500) + 1;
@@ -100,12 +125,32 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
+      {hasSkins && (
+        <div className="skin-picker" role="group" aria-label="Skin">
+          <span className="skin-picker-label">SKIN</span>
+          <div className="av-chips">
+            {SKIN_IDS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                className={`chip${skin === id ? " active" : ""}`}
+                aria-pressed={skin === id}
+                onClick={() => chooseSkin(id)}
+              >
+                {SKIN_NAMES[id]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="crt">
         <div className="crt-screen">
           {Engine ? (
             <Engine
               key={runId}
               paused={paused || over}
+              skin={skin}
               onStats={(stats) => {
                 setScore(stats.score);
                 if (stats.lives !== undefined) setLives(stats.lives);

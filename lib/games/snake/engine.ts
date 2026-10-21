@@ -1,4 +1,6 @@
 import { FRUITS, loadFruits } from "./fruits";
+import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
+import type { SkinId } from "../skin-ids";
 
 export interface SnakeCallbacks {
   onStats: (stats: { score: number }) => void; // solo al cambiar
@@ -10,6 +12,7 @@ export interface SnakeGame {
   resume(): void;
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
+  setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
 }
 
 interface Cell {
@@ -49,7 +52,9 @@ const KEY_TO_DIR: Record<string, Cell> = {
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
 
-export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallbacks): SnakeGame {
+export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallbacks,
+  skinId: SkinId = DEFAULT_SKIN
+): SnakeGame {
   const ctx = canvas.getContext("2d")!;
 
   let snake: Cell[] = [];
@@ -63,6 +68,7 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
   let paused = false;
   let stopped = false;
   let sheet: HTMLImageElement | null = null;
+  let skin: SkinDef = SKINS[skinId] ?? SKINS[DEFAULT_SKIN];
 
   function emitStats() {
     callbacks.onStats({ score });
@@ -118,33 +124,49 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
   function drawFruit() {
     const cx = fruit.x * CELL + CELL / 2;
     const cy = fruit.y * CELL + CELL / 2;
-    const sprite = sheet ? FRUITS[fruitName] : null;
+    const sprite = sheet && skin.atlas ? FRUITS[fruitName] : null;
     if (sheet && sprite) {
       const scale = (CELL - 6) / Math.max(sprite.w, sprite.h);
       const dw = sprite.w * scale;
       const dh = sprite.h * scale;
       ctx.drawImage(sheet, sprite.x, sprite.y, sprite.w, sprite.h, cx - dw / 2, cy - dh / 2, dw, dh);
     } else {
-      ctx.fillStyle = "#ff2bd6";
-      ctx.shadowColor = "#ff2bd6";
-      ctx.shadowBlur = 10;
+      ctx.fillStyle = skin.fruit;
+      ctx.shadowColor = skin.fruit;
+      ctx.shadowBlur = skin.fruitGlow;
       ctx.beginPath();
-      ctx.arc(cx, cy, CELL / 2 - 8, 0, Math.PI * 2);
+      if (skin.fruitShape === "diamond") {
+        const r = CELL / 2 - 6;
+        ctx.moveTo(cx, cy - r);
+        ctx.lineTo(cx + r, cy);
+        ctx.lineTo(cx, cy + r);
+        ctx.lineTo(cx - r, cy);
+        ctx.closePath();
+      } else {
+        ctx.arc(cx, cy, CELL / 2 - 8, 0, Math.PI * 2);
+      }
       ctx.fill();
       ctx.shadowBlur = 0;
+      ctx.shadowColor = "transparent";
     }
   }
 
   function drawSnake() {
     const pad = 3;
-    ctx.shadowColor = "#39ff14";
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = skin.body;
+    ctx.shadowBlur = skin.glow;
     for (let i = snake.length - 1; i >= 0; i--) {
       const c = snake[i];
-      ctx.fillStyle = i === 0 ? "#b6ffa0" : "#39ff14";
+      ctx.fillStyle = i === 0 ? skin.head : skin.body;
       ctx.fillRect(c.x * CELL + pad, c.y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+      if (skin.bodyBorder) {
+        ctx.strokeStyle = skin.bodyBorder;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(c.x * CELL + pad + 1, c.y * CELL + pad + 1, CELL - pad * 2 - 2, CELL - pad * 2 - 2);
+      }
     }
     ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
 
     // Ojos: dos puntos desplazados hacia la dirección de avance.
     const head = snake[0];
@@ -154,7 +176,7 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
     const fy = dir.y * 7;
     const sx = -dir.y * 7;
     const sy = dir.x * 7;
-    ctx.fillStyle = "#0a0a14";
+    ctx.fillStyle = skin.eyes;
     for (const side of [-1, 1]) {
       ctx.beginPath();
       ctx.arc(cx + fx + sx * side, cy + fy + sy * side, 3, 0, Math.PI * 2);
@@ -163,9 +185,9 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
   }
 
   function draw() {
-    ctx.fillStyle = "#0a0a14";
+    ctx.fillStyle = skin.background;
     ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    ctx.strokeStyle = skin.grid;
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let x = 0; x <= COLS; x++) {
@@ -270,6 +292,10 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
       if (!paused) return;
       paused = false;
       startLoop();
+    },
+    setSkin(id: SkinId) {
+      skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
+      if (!stopped) draw();
     },
     stop() {
       stopped = true;
