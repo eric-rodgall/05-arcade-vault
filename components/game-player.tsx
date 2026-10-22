@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GAME_ENGINES, SKIN_GAMES } from "@/components/game-canvases";
 import { useSession } from "@/components/session-provider";
+import { TouchControls } from "@/components/touch-controls";
 import type { Game } from "@/lib/games";
+import type { GameInputSink } from "@/lib/games/input";
 import { DEFAULT_SKIN, SKIN_IDS, SKIN_NAMES, isSkinId, type SkinId } from "@/lib/games/skin-ids";
+import { TOUCH_LAYOUTS } from "@/lib/games/touch-layouts";
 
 const LIVES = 3;
 const MAX_NAME = 10;
@@ -27,6 +30,8 @@ export function GamePlayer({ game }: { game: Game }) {
   const { user } = useSession();
   const [score, setScore] = useState(0);
   const Engine = GAME_ENGINES[game.id];
+  const touchLayout = TOUCH_LAYOUTS[game.id];
+  const inputRef = useRef<GameInputSink | null>(null);
   const [lives, setLives] = useState<number | null>(Engine ? null : LIVES);
   const [engineLevel, setEngineLevel] = useState(1);
   const [runId, setRunId] = useState(0);
@@ -94,7 +99,7 @@ export function GamePlayer({ game }: { game: Game }) {
   return (
     <div className="av-player fade-in">
       <div className="player-hud">
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <div className="hud-stats">
           <div className="hud-stat">
             <div className="l">Jugador</div>
             <div className="v" style={{ color: "var(--ink)" }}>{name}</div>
@@ -151,6 +156,7 @@ export function GamePlayer({ game }: { game: Game }) {
               key={runId}
               paused={paused || over}
               skin={skin}
+              inputRef={inputRef}
               onStats={(stats) => {
                 setScore(stats.score);
                 if (stats.lives !== undefined) setLives(stats.lives);
@@ -190,6 +196,10 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+
+      {Engine && touchLayout && (
+        <TouchControls layout={touchLayout} inputRef={inputRef} disabled={paused || over} />
+      )}
 
       {over && (
         <div className="modal-bd">

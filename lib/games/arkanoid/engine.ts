@@ -12,6 +12,7 @@ import {
 } from "./sprites";
 import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
 import type { SkinId } from "../skin-ids";
+import type { GameInputCode } from "../input";
 
 export interface ArkanoidCallbacks {
   onStats: (stats: { score: number; lives: number; level: number }) => void; // solo al cambiar
@@ -24,6 +25,7 @@ export interface ArkanoidGame {
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
   setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
+  setInput(code: GameInputCode, pressed: boolean): void; // gamepad táctil
 }
 
 interface Block {
@@ -322,13 +324,16 @@ export function createArkanoidGame(
   function onKeyDown(e: KeyboardEvent) {
     if (isTextField(e.target) || !GAME_KEYS.includes(e.code)) return;
     e.preventDefault();
-    if (e.code === "ArrowLeft") keys.ArrowLeft = true;
-    else keys.ArrowRight = true;
+    setKey(e.code, true);
   }
 
   function onKeyUp(e: KeyboardEvent) {
-    if (e.code === "ArrowLeft") keys.ArrowLeft = false;
-    else if (e.code === "ArrowRight") keys.ArrowRight = false;
+    setKey(e.code, false);
+  }
+
+  function setKey(code: string, down: boolean) {
+    if (code === "ArrowLeft") keys.ArrowLeft = down;
+    else if (code === "ArrowRight") keys.ArrowRight = down;
   }
 
   function onMouseMove(e: MouseEvent) {
@@ -369,6 +374,11 @@ export function createArkanoidGame(
     setSkin(id: SkinId) {
       skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
       if (!stopped) draw();
+    },
+    setInput(code, pressed) {
+      // Soltar siempre se acepta, para no dejar teclas pegadas al pausar.
+      if (pressed && (paused || over || stopped)) return;
+      setKey(code, pressed);
     },
     stop() {
       stopped = true;

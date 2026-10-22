@@ -46,6 +46,7 @@ Subagents live in `.claude/agents/`:
 | 07  | `juego-caida-tetris`            | `caida` (TETRIS) + engine registry                                   |
 | 08  | `juego-bloque-buster-arkanoid`  | `bloque-buster` (ARKANOID)                                           |
 | 09  | `juego-snake`                   | `serpentina` (SNAKE)                                                 |
+| 10  | `controles-tactiles-movil`      | Virtual gamepad for the 4 real games on touch devices                |
 
 ## Routes
 
@@ -74,6 +75,7 @@ API (Route Handlers in `app/api/`):
 - `lib/data/games.ts` (`getGames()`, `getGame(id)`), `lib/data/scores.ts` (`getTopScores`, `getPlayerBest`, `normalizePlayerName`, `MAX_NAME_LENGTH`, `MAX_SCORE`).
 - `lib/scores.ts` (`seededScores`, only for the `/juegos/[id]` aside), `lib/home.ts` (mocked home data).
 - Client components besides the player/canvases: `reveal.tsx` (adds `.in` via `IntersectionObserver`), `contact-form.tsx`, `hall-of-fame.tsx`, `library.tsx`, `game-card.tsx`, `auth-form.tsx`, `session-provider.tsx`, `nav.tsx`. Everything else is a server component.
+- Touch controls: `lib/games/input.ts` (`GameInputCode`, `GameInputSink { setInput(code, pressed) }`), `lib/games/touch-layouts.ts` (`TOUCH_LAYOUTS` per `games.id`: D-pad + A/B buttons) and `components/touch-controls.tsx` (pointer events, multitouch; `caida` repeats ←/→/↓ after 220 ms every 80 ms). Shown only under `@media (pointer: coarse)`, mounted by `GamePlayer` under `.crt` and disabled while paused or when the end modal is open.
 - Icons/decoration: `home-silhouettes.tsx`, `feature-icon.tsx`, `highlight-icon.tsx`, `mini-card.tsx`.
 
 ## Supabase
@@ -100,6 +102,7 @@ Architecture shared by every real game:
 - Pure engine in `lib/games/<juego>/engine.ts` (no React): `create<Name>Game(canvas, callbacks)` owns the state, the `requestAnimationFrame` loop and keyboard input (ignores `<input>`/`<textarea>`, `preventDefault` only on its own keys). Callbacks `{ onStats(...), onGameOver(finalScore) }` (`onStats` fires only on change); returns `{ pause, resume, stop, destroy }`.
 - Client canvas component in `components/<juego>-canvas.tsx`: mounts a fixed-size `<canvas>` (`object-fit: contain`) and calls `destroy()` on cleanup. The canvas draws no HUD or overlays.
 - Registry `GAME_ENGINES` in `components/game-canvases.tsx` with `EngineProps { paused, onStats({ score, lives?, level? }), onGameOver }`. `GamePlayer` renders the engine with `key={runId}` (restart remounts), pauses it while paused or while the end modal is open, and fills the HUD from `onStats`. Games without lives show "—" in Vidas.
+- Every engine also returns `setInput(code, pressed)` (same logic as its keyboard handler, which keeps working). Releasing is always accepted; pressing is ignored while paused, over or stopped. Canvas components fill `EngineProps.inputRef` with the engine and clear it on unmount. New games must implement `setInput` and add an entry to `TOUCH_LAYOUTS`.
 - New games: follow `/add-game`. Reference sources are in `references/started-games/` and `references/source-assets/` (never imported).
 
 | Slug (title)               | Engine files                                                                                                                              | Canvas                                      | Controls                                           | Rules                                                                                                                                |
