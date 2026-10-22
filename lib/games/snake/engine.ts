@@ -1,6 +1,7 @@
 import { FRUITS, loadFruits } from "./fruits";
 import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
 import type { SkinId } from "../skin-ids";
+import type { GameInputCode } from "../input";
 
 export interface SnakeCallbacks {
   onStats: (stats: { score: number }) => void; // solo al cambiar
@@ -13,6 +14,7 @@ export interface SnakeGame {
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
   setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
+  setInput(code: GameInputCode, pressed: boolean): void; // gamepad táctil
 }
 
 interface Cell {
@@ -245,17 +247,21 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
     return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
   }
 
-  function onKeyDown(e: KeyboardEvent) {
-    if (isTextField(e.target)) return;
-    const wanted = KEY_TO_DIR[e.code];
-    if (!wanted) return;
-    if (ARROW_KEYS.includes(e.code)) e.preventDefault();
-    if (paused || over || stopped) return;
+  function press(code: string) {
+    const wanted = KEY_TO_DIR[code];
+    if (!wanted || paused || over || stopped) return;
     const ref = queue.length > 0 ? queue[queue.length - 1] : dir;
     const same = wanted.x === ref.x && wanted.y === ref.y;
     const opposite = wanted.x === -ref.x && wanted.y === -ref.y;
     if (same || opposite || queue.length >= MAX_QUEUED_TURNS) return;
     queue.push(wanted);
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (isTextField(e.target)) return;
+    if (!KEY_TO_DIR[e.code]) return;
+    if (ARROW_KEYS.includes(e.code)) e.preventDefault();
+    press(e.code);
   }
 
   window.addEventListener("keydown", onKeyDown);
@@ -296,6 +302,9 @@ export function createSnakeGame(canvas: HTMLCanvasElement, callbacks: SnakeCallb
     setSkin(id: SkinId) {
       skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
       if (!stopped) draw();
+    },
+    setInput(code, pressed) {
+      if (pressed) press(code);
     },
     stop() {
       stopped = true;

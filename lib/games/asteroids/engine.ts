@@ -16,6 +16,7 @@ import {
 } from "./entities";
 import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
 import type { SkinId } from "../skin-ids";
+import type { GameInputCode } from "../input";
 
 export interface AsteroidsCallbacks {
   onStats: (stats: { score: number; lives: number; level: number }) => void; // al cambiar cualquiera
@@ -26,6 +27,7 @@ export interface AsteroidsGame {
   pause(): void;
   resume(): void;
   setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
+  setInput(code: GameInputCode, pressed: boolean): void; // gamepad táctil
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias; lo llama el cleanup del useEffect
 }
@@ -51,11 +53,14 @@ export function createAsteroidsGame(
   const isTextField = (target: EventTarget | null) =>
     target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
 
+  const press = (code: string) => {
+    if (!keys[code]) justPressed[code] = true;
+    keys[code] = true;
+  };
   const onKeyDown = (e: KeyboardEvent) => {
     if (isTextField(e.target)) return;
     if (GAME_KEYS.includes(e.code)) e.preventDefault();
-    if (!keys[e.code]) justPressed[e.code] = true;
-    keys[e.code] = true;
+    press(e.code);
   };
   const onKeyUp = (e: KeyboardEvent) => {
     keys[e.code] = false;
@@ -294,6 +299,11 @@ export function createAsteroidsGame(
     setSkin(id: SkinId) {
       skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
       draw(); // redibuja también en pausa
+    },
+    setInput(code, pressed) {
+      // Soltar siempre se acepta; pulsar solo con el loop activo (no pausado ni detenido).
+      if (!pressed) keys[code] = false;
+      else if (running && !stopped) press(code);
     },
     stop() {
       stopped = true;

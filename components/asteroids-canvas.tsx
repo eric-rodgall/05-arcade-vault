@@ -13,6 +13,7 @@ export function AsteroidsCanvas({
   onStats,
   onGameOver,
   skin = DEFAULT_SKIN,
+  inputRef,
 }: EngineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<AsteroidsGame | null>(null);
@@ -46,6 +47,14 @@ export function AsteroidsCanvas({
       gameRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!inputRef) return;
+    inputRef.current = gameRef.current;
+    return () => {
+      inputRef.current = null;
+    };
+  }, [inputRef]);
 
   useEffect(() => {
     if (paused) gameRef.current?.pause();

@@ -10,7 +10,7 @@ import {
 } from "@/lib/games/tetris/engine";
 import { DEFAULT_SKIN } from "@/lib/games/skin-ids";
 
-export function TetrisCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKIN }: EngineProps) {
+export function TetrisCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKIN, inputRef }: EngineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<TetrisGame | null>(null);
   const pausedRef = useRef(paused);
@@ -43,6 +43,14 @@ export function TetrisCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKIN 
       gameRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!inputRef) return;
+    inputRef.current = gameRef.current;
+    return () => {
+      inputRef.current = null;
+    };
+  }, [inputRef]);
 
   useEffect(() => {
     if (paused) gameRef.current?.pause();

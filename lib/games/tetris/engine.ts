@@ -14,6 +14,7 @@ import {
 } from "./pieces";
 import { SKINS, DEFAULT_SKIN, type SkinDef } from "./skins";
 import type { SkinId } from "../skin-ids";
+import type { GameInputCode } from "../input";
 
 export interface TetrisCallbacks {
   onStats: (stats: { score: number; level: number; lines: number }) => void; // solo al cambiar
@@ -26,6 +27,7 @@ export interface TetrisGame {
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
   setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
+  setInput(code: GameInputCode, pressed: boolean): void; // gamepad táctil
 }
 
 interface Piece {
@@ -43,7 +45,7 @@ const NEXT_BLOCK = 30;
 const GAME_KEYS = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space"];
 
 function randomPiece(): Piece {
-  const type = Math.floor(Math.random() * 8) + 1;
+  const type = Math.floor(Math.random() * 7) + 1;
   const shape = (PIECES[type] as Shape).map((row) => [...row]);
   return {
     type,
@@ -165,11 +167,9 @@ export function createTetrisGame(
   const isTextField = (target: EventTarget | null) =>
     target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
 
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (isTextField(e.target)) return;
-    if (GAME_KEYS.includes(e.code)) e.preventDefault();
-    if (paused || over) return;
-    switch (e.code) {
+  const press = (code: string) => {
+    if (paused || over || stopped) return;
+    switch (code) {
       case "ArrowLeft":
         if (!collide(board, current.shape, current.x - 1, current.y))
           current.x--;
@@ -193,6 +193,12 @@ export function createTetrisGame(
     }
     emitStats();
     if (!over) draw();
+  };
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (isTextField(e.target)) return;
+    if (GAME_KEYS.includes(e.code)) e.preventDefault();
+    press(e.code);
   };
 
   // ── Dibujo ──────────────────────────────────────────────────────────────────
@@ -356,6 +362,9 @@ export function createTetrisGame(
     setSkin(id: SkinId) {
       skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
       if (!destroyed) draw();
+    },
+    setInput(code, pressed) {
+      if (pressed) press(code);
     },
     stop() {
       stopped = true;

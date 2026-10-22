@@ -10,7 +10,7 @@ import {
 } from "@/lib/games/arkanoid/engine";
 import { DEFAULT_SKIN } from "@/lib/games/skin-ids";
 
-export function ArkanoidCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKIN }: EngineProps) {
+export function ArkanoidCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKIN, inputRef }: EngineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<ArkanoidGame | null>(null);
   const pausedRef = useRef(paused);
@@ -43,6 +43,14 @@ export function ArkanoidCanvas({ paused, onStats, onGameOver, skin = DEFAULT_SKI
       gameRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!inputRef) return;
+    inputRef.current = gameRef.current;
+    return () => {
+      inputRef.current = null;
+    };
+  }, [inputRef]);
 
   useEffect(() => {
     if (paused) gameRef.current?.pause();
