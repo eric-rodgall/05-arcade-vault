@@ -32,6 +32,7 @@ Subagents live in `.claude/agents/`:
 - `game-planner` — suggests which game to add next; keeps its memory in `.claude/agent-memory/game-planner/` (committed) and maintains `references/geme-suggestions-todo.md`. Never writes code.
 - `game-jam` — receives a THEME and writes specs (never code) for new arcade games in `specs/game-jam/<game-id>/` (`01-diseno-juego.md`, `02-motor-y-canvas.md`), all in `Draft` for review before `/spec-impl`. It can also be asked for a single game, e.g. `invasores` (specs written, not implemented).
 - `skin-designer` — takes a game slug (or "todos") and makes sure it has at least 3 skins: `clasico` (default, current look), `neon` and `retro`, all readable on dark backgrounds. For implemented games it edits the engine/canvas/`GamePlayer` (skin passed to the engine as data, selector in the UI, `localStorage` key `av_skin_<slug>`) and runs lint/build; for specified-only games it only writes the report. Reports go in `specs/skins/<game-id>.md`. No game has skins yet (TETRIS is the first to migrate); it does not edit `CLAUDE.md` or commit.
+- `mobile-porter` — takes a game slug (or "todos") and checks that its controls work on web (keyboard/mouse) and mobile (virtual gamepad) following SPEC 10: engine `setInput`, canvas `inputRef`, `TOUCH_LAYOUTS`, `TouchControls` and the player CSS. It fixes small gaps in that code, runs lint/build and writes reports in `specs/mobile/<game-id>.md`. It has no browser, so it never tests on a device; it does not edit `CLAUDE.md` or commit.
 
 ## Specs done
 
@@ -47,6 +48,7 @@ Subagents live in `.claude/agents/`:
 | 08  | `juego-bloque-buster-arkanoid`  | `bloque-buster` (ARKANOID)                                           |
 | 09  | `juego-snake`                   | `serpentina` (SNAKE)                                                 |
 | 10  | `controles-tactiles-movil`      | Virtual gamepad for the 4 real games on touch devices                |
+| 11  | `gamepad-estilo-neon`           | Gamepad restyled as the neon "MK-II" pad (shell, 3D D-pad, A/B)      |
 
 ## Routes
 
@@ -75,7 +77,7 @@ API (Route Handlers in `app/api/`):
 - `lib/data/games.ts` (`getGames()`, `getGame(id)`), `lib/data/scores.ts` (`getTopScores`, `getPlayerBest`, `normalizePlayerName`, `MAX_NAME_LENGTH`, `MAX_SCORE`).
 - `lib/scores.ts` (`seededScores`, only for the `/juegos/[id]` aside), `lib/home.ts` (mocked home data).
 - Client components besides the player/canvases: `reveal.tsx` (adds `.in` via `IntersectionObserver`), `contact-form.tsx`, `hall-of-fame.tsx`, `library.tsx`, `game-card.tsx`, `auth-form.tsx`, `session-provider.tsx`, `nav.tsx`. Everything else is a server component.
-- Touch controls: `lib/games/input.ts` (`GameInputCode`, `GameInputSink { setInput(code, pressed) }`), `lib/games/touch-layouts.ts` (`TOUCH_LAYOUTS` per `games.id`: D-pad + A/B buttons) and `components/touch-controls.tsx` (pointer events, multitouch; `caida` repeats ←/→/↓ after 220 ms every 80 ms). Shown only under `@media (pointer: coarse)`, mounted by `GamePlayer` under `.crt` and disabled while paused or when the end modal is open.
+- Touch controls: `lib/games/input.ts` (`GameInputCode`, `GameInputSink { setInput(code, pressed) }`), `lib/games/touch-layouts.ts` (`TOUCH_LAYOUTS` per `games.id`: D-pad + A/B buttons) and `components/touch-controls.tsx` (pointer events, multitouch; `caida` repeats ←/→/↓ after 220 ms every 80 ms). Shown only under `@media (pointer: coarse)`, mounted by `GamePlayer` under `.crt` and disabled while paused or when the end modal is open. Styled as the neon MK-II pad (SPEC 11): `.gp` shell, `.dp` D-pad keys with SVG arrows and a `.dp-hub` gem (only the game's keys are drawn), round `.ab` A/B buttons (A magenta, B cian, visual order `B | A`, letter inside and the action label below), `on` class set from React state while pressed; D-pad keys and A/B stay ≥ 56 px and A/B stack vertically at ≤ 520 px. Styles in `app/globals.css`; the visual source is `references/gamepad-assets/` (never imported).
 - Icons/decoration: `home-silhouettes.tsx`, `feature-icon.tsx`, `highlight-icon.tsx`, `mini-card.tsx`.
 
 ## Supabase
@@ -117,5 +119,6 @@ Assets: `public/games/bloque-buster/spritesheet-breakout.png`, `public/games/ser
 ## References
 
 - `references/templates/` — original design prototype (in-browser Babel React + `styles.css`, now in `app/globals.css`). Visual reference only, excluded from ESLint. `references/templates/home-about/` is the home/about prototype; only the home was ported (the about page and the `.gp*` gamepad are out of scope).
+- `references/gamepad-assets/` — standalone neon gamepad (`gamepad.html`, `gamepad-neon.png`) that SPEC 11 ported to `components/touch-controls.tsx`. Visual reference only.
 - `references/started-games/` — original JS games ported to TypeScript (`02-asteroids`, `03-tetris`, `04-arkanoid`).
 - `demos/Demo.tsx` is a placeholder; `resources/` holds a sound file not used by the app.
