@@ -18,6 +18,8 @@ export const ROW_START = 13;
 // Bocas destino: 5 bocas de 2 columnas cada una sobre la fila 0.
 export const GOAL_COUNT = 5;
 export const GOAL_WIDTH = 2;
+/** Columna donde empieza la boca `i`: 1-2, 4-5, 7-8, 10-11 y 13-14 (muro entre ellas). */
+export const goalStartCol = (i: number) => 1 + i * 3;
 
 export const JUMP_MS = 120; // duración del salto de 1 celda
 export const START_LIVES = 3;
