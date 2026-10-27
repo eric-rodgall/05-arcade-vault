@@ -25,6 +25,7 @@ Skills live in `.agents/skills/` (symlinked from `.claude/skills/`):
 - `/frontend-design` — use it to build UI.
 - `/spec` — design a spec, section by section.
 - `/spec-impl` — implement an approved spec step by step.
+- `/spec-impl-game` — same as `/spec-impl` (it reads and follows it), then runs `skin-designer` and afterwards `mobile-porter` on the game's slug, strictly in sequence.
 - `/add-game` — add a playable game (engine + canvas + `games` row + leaderboard).
 
 Subagents live in `.claude/agents/`:
