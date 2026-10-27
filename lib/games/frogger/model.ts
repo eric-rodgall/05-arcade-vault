@@ -24,6 +24,10 @@ export const goalStartCol = (i: number) => 1 + i * 3;
 export const JUMP_MS = 120; // duración del salto de 1 celda
 export const START_LIVES = 3;
 export const ROUND_SECONDS = 15; // tiempo inicial de ronda
+export const ROUND_SECONDS_MIN = 8;
+/** Tiempo de ronda en segundos: baja 1 s por nivel hasta `ROUND_SECONDS_MIN`. */
+export const roundSeconds = (level: number) =>
+  Math.max(ROUND_SECONDS_MIN, ROUND_SECONDS - (level - 1));
 export const SPEED_PER_LEVEL = 1.15; // +15 % de velocidad por nivel
 
 // Ciclo de inmersión de las tortugas

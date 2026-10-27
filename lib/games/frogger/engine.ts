@@ -13,7 +13,7 @@ import {
   goalStartCol,
   H,
   JUMP_MS,
-  ROUND_SECONDS,
+  roundSeconds,
   ROW_GOALS,
   ROW_RIVER_BOT,
   ROW_RIVER_TOP,
@@ -72,7 +72,7 @@ export function createFroggerGame(
 ): FroggerGame {
   const ctx = canvas.getContext("2d")!;
 
-  const level = 1;
+  let level = 1;
   const lives = START_LIVES;
   let score = 0;
   let lanes: Lane[] = buildLanes(level);
@@ -84,10 +84,11 @@ export function createFroggerGame(
   let pendingDir: Direction | null = null;
   let farthestRow = ROW_START; // fila más alta alcanzada en esta vida
   const GOAL_POINTS = 50;
+  const ROUND_POINTS = 200;
   const ADVANCE_POINTS = 10;
   const TIME_BONUS_PER_SECOND = 10;
-  let timeLeft = ROUND_SECONDS * 1000; // ms
-  const timeTotal = timeLeft;
+  let timeLeft = roundSeconds(level) * 1000; // ms
+  let timeTotal = timeLeft;
   const over = false;
   let paused = false;
   let stopped = false;
@@ -220,8 +221,12 @@ export function createFroggerGame(
     if (frog.col < -0.5 || frog.col > COLS - 0.5) killFrog(); // arrastrada fuera del río
   }
 
-  // Paso 6: sumar la ronda, subir de nivel y reconstruir carriles.
   function completeRound() {
+    score += ROUND_POINTS;
+    level += 1;
+    goals = Array<boolean>(GOAL_COUNT).fill(false);
+    lanes = buildLanes(level);
+    timeTotal = roundSeconds(level) * 1000;
     respawn();
   }
 
