@@ -31,6 +31,8 @@ import {
   type Lane,
 } from "./model";
 import type { GameInputCode } from "../input";
+import type { SkinId } from "../skin-ids";
+import { DEFAULT_SKIN, SKINS, type SkinDef } from "./skins";
 
 export { H, W };
 
@@ -45,6 +47,7 @@ export interface FroggerGame {
   stop(): void; // detiene el loop y quita los listeners; no se puede reanudar
   destroy(): void; // stop() + liberar referencias
   setInput(code: GameInputCode, pressed: boolean): void; // gamepad táctil
+  setSkin(skin: SkinId): void; // cambia el aspecto sin reiniciar la partida
 }
 
 const MAX_DT = 50; // ms
@@ -64,13 +67,13 @@ const DELTA: Record<Direction, { dc: number; dr: number }> = {
   right: { dc: 1, dr: 0 },
 };
 
-const CAR_COLORS = ["#e53935", "#fdd835", "#1e88e5"];
-
 export function createFroggerGame(
   canvas: HTMLCanvasElement,
-  callbacks: FroggerCallbacks
+  callbacks: FroggerCallbacks,
+  skinId: SkinId = DEFAULT_SKIN
 ): FroggerGame {
   const ctx = canvas.getContext("2d")!;
+  let skin: SkinDef = SKINS[skinId] ?? SKINS[DEFAULT_SKIN];
 
   let level = 1;
   let lives = START_LIVES;
@@ -254,20 +257,55 @@ export function createFroggerGame(
   }
 
   // ── Dibujo ──────────────────────────────────────────────────────────────────
+  // Rellena la ruta actual con brillo opcional y borde duro opcional.
+  function paint(color: string) {
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = skin.glow;
+  }
+
+  function fillRectS(
+    color: string,
+    x: number,
+    y: number,
+    w: number,
+    h: number
+  ) {
+    paint(color);
+    ctx.fillRect(x, y, w, h);
+    ctx.shadowBlur = 0;
+    if (skin.outline) {
+      ctx.strokeStyle = skin.outline;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+    }
+  }
+
+  function fillPathS(color: string) {
+    paint(color);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    if (skin.outline) {
+      ctx.strokeStyle = skin.outline;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
   function drawZones() {
     const bands: [number, number, string][] = [
-      [ROW_GOALS, ROW_GOALS, "#0b3d1a"],
-      [ROW_RIVER_TOP, ROW_RIVER_BOT, "#0a1f5c"],
-      [ROW_SAFE_MID, ROW_SAFE_MID, "#14532d"],
-      [ROW_ROAD_TOP, ROW_ROAD_BOT, "#101014"],
-      [ROW_START, ROW_START, "#14532d"],
+      [ROW_GOALS, ROW_GOALS, skin.goalsBand],
+      [ROW_RIVER_TOP, ROW_RIVER_BOT, skin.river],
+      [ROW_SAFE_MID, ROW_SAFE_MID, skin.safe],
+      [ROW_ROAD_TOP, ROW_ROAD_BOT, skin.road],
+      [ROW_START, ROW_START, skin.safe],
     ];
     for (const [from, to, color] of bands) {
       ctx.fillStyle = color;
       ctx.fillRect(0, from * CELL, W, (to - from + 1) * CELL);
     }
     // Líneas discontinuas entre carriles de carretera.
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.strokeStyle = skin.laneLine;
     ctx.lineWidth = 2;
     ctx.setLineDash([14, 14]);
     ctx.beginPath();
@@ -283,9 +321,9 @@ export function createFroggerGame(
     for (let i = 0; i < GOAL_COUNT; i++) {
       const x = goalStartCol(i) * CELL;
       const w = GOAL_WIDTH * CELL;
-      ctx.fillStyle = "#1f7a34";
+      ctx.fillStyle = skin.goalFill;
       ctx.fillRect(x, ROW_GOALS * CELL + 4, w, CELL - 4);
-      ctx.strokeStyle = "#e0b43a";
+      ctx.strokeStyle = skin.goalBorder;
       ctx.lineWidth = 2;
       ctx.strokeRect(x + 1, ROW_GOALS * CELL + 5, w - 2, CELL - 6);
       if (goals[i])
@@ -298,22 +336,24 @@ export function createFroggerGame(
     const y = lane.row * CELL;
     const w = e.width * CELL;
     if (e.type === "car") {
-      ctx.fillStyle = CAR_COLORS[(lane.row + index) % CAR_COLORS.length];
-      ctx.fillRect(x + 3, y + 8, w - 6, CELL - 16);
-      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      fillRectS(
+        skin.carColors[(lane.row + index) % skin.carColors.length],
+        x + 3,
+        y + 8,
+        w - 6,
+        CELL - 16
+      );
+      ctx.fillStyle = skin.carWindow;
       ctx.fillRect(x + (lane.dir === 1 ? w - 16 : 6), y + 11, 10, CELL - 22);
       drawWheels(x, y, w);
     } else if (e.type === "truck") {
-      ctx.fillStyle = "#9aa0a6";
-      ctx.fillRect(x + 3, y + 7, w - 6, CELL - 14);
+      fillRectS(skin.truckBody, x + 3, y + 7, w - 6, CELL - 14);
       const cabX = lane.dir === 1 ? x + w - 20 : x + 3;
-      ctx.fillStyle = "#e8710a";
-      ctx.fillRect(cabX, y + 7, 17, CELL - 14);
+      fillRectS(skin.truckCab, cabX, y + 7, 17, CELL - 14);
       drawWheels(x, y, w);
     } else if (e.type === "log") {
-      ctx.fillStyle = "#7a4a21";
-      ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
-      ctx.strokeStyle = "#4e2d12";
+      fillRectS(skin.log, x + 1, y + 6, w - 2, CELL - 12);
+      ctx.strokeStyle = skin.logGrain;
       ctx.lineWidth = 2;
       ctx.beginPath();
       for (let lx = x + 14; lx < x + w - 6; lx += 22) {
@@ -326,18 +366,21 @@ export function createFroggerGame(
         const cx = x + c * CELL + CELL / 2;
         const cy = y + CELL / 2;
         if (e.submerged) {
-          ctx.strokeStyle = "rgba(60,200,120,0.35)";
+          ctx.strokeStyle = skin.turtleSubmerged;
           ctx.lineWidth = 2;
+          if (skin.blocky) ctx.setLineDash([6, 4]);
           ctx.beginPath();
-          ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+          if (skin.blocky) ctx.rect(cx - 14, cy - 14, 28, 28);
+          else ctx.arc(cx, cy, 14, 0, Math.PI * 2);
           ctx.stroke();
+          ctx.setLineDash([]);
           continue;
         }
-        ctx.fillStyle = "#2e9e4f";
         ctx.beginPath();
-        ctx.arc(cx, cy, 15, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = "#1b6b34";
+        if (skin.blocky) ctx.rect(cx - 15, cy - 15, 30, 30);
+        else ctx.arc(cx, cy, 15, 0, Math.PI * 2);
+        fillPathS(skin.turtle);
+        ctx.strokeStyle = skin.turtleLine;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(cx, cy, 8, 0, Math.PI * 2);
@@ -351,7 +394,7 @@ export function createFroggerGame(
   }
 
   function drawWheels(x: number, y: number, w: number) {
-    ctx.fillStyle = "#050505";
+    ctx.fillStyle = skin.wheel;
     for (const wx of [x + 12, x + w - 12]) {
       ctx.beginPath();
       ctx.arc(wx, y + 8, 4, 0, Math.PI * 2);
@@ -378,23 +421,23 @@ export function createFroggerGame(
     }[dir];
     ctx.rotate(angle);
     ctx.scale(scale, scale);
-    ctx.fillStyle = "#3ddc57";
     // Patas: más abiertas durante el salto.
     const spread = 12 + leap * 6;
     for (const sx of [-1, 1]) {
-      ctx.fillRect(sx * spread - 3, -11, 6, 8);
-      ctx.fillRect(sx * spread - 3, 5, 6, 8);
+      fillRectS(skin.frog, sx * spread - 3, -11, 6, 8);
+      fillRectS(skin.frog, sx * spread - 3, 5, 6, 8);
     }
     ctx.beginPath();
-    ctx.ellipse(0, 0, 14, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
+    if (skin.blocky) ctx.rect(-13, -11, 26, 22);
+    else ctx.ellipse(0, 0, 14, 12, 0, 0, Math.PI * 2);
+    fillPathS(skin.frog);
+    ctx.fillStyle = skin.frogEye;
     for (const sx of [-1, 1]) {
       ctx.beginPath();
       ctx.arc(sx * 6, -9, 3.5, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = skin.frogPupil;
     for (const sx of [-1, 1]) {
       ctx.beginPath();
       ctx.arc(sx * 6, -10, 1.5, 0, Math.PI * 2);
@@ -426,7 +469,7 @@ export function createFroggerGame(
   function drawTimeBar() {
     const ratio = Math.max(0, timeLeft / timeTotal);
     ctx.fillStyle =
-      ratio > 0.5 ? "#3ddc57" : ratio > 0.25 ? "#fdd835" : "#e53935";
+      ratio > 0.5 ? skin.timeHigh : ratio > 0.25 ? skin.timeMid : skin.timeLow;
     ctx.fillRect(0, 0, W * ratio, 6);
   }
 
@@ -510,6 +553,10 @@ export function createFroggerGame(
     },
     setInput(code, pressed) {
       if (pressed) press(code);
+    },
+    setSkin(id) {
+      skin = SKINS[id] ?? SKINS[DEFAULT_SKIN];
+      if (!running) draw(); // pausada o terminada: repinta con el nuevo aspecto
     },
     stop() {
       stopped = true;

@@ -21,7 +21,7 @@ Si no recibes un slug de juego (o «todos»), pídelo y no hagas nada más.
 ## 2. Alcance
 
 - **Implementados** (tienen entrada en `GAME_ENGINES`: hoy `asteroides`, `caida`, `bloque-buster`, `serpentina`, y los que se añadan): se revisan y se corrigen.
-- **Simulados o solo especificados** (`gloton`, `invasores`, `ranaria`, `duelo-pixel`…): no hay motor al que enviar entrada. Comprueba solo que **no** tienen `TOUCH_LAYOUTS` ni montan `.touch-controls`, y escribe el informe indicando qué debe llevar su spec para que, al implementarse, cumplan el SPEC 10 (`setInput` + entrada en `TOUCH_LAYOUTS`). No inventes un motor.
+- **Simulados o solo especificados** (`gloton`, `invasores`, `duelo-pixel`…): no hay motor al que enviar entrada. Comprueba solo que **no** tienen `TOUCH_LAYOUTS` ni montan `.touch-controls`, y escribe el informe indicando qué debe llevar su spec para que, al implementarse, cumplan el SPEC 10 (`setInput` + entrada en `TOUCH_LAYOUTS`). No inventes un motor.
 
 ## 3. Checklist por juego
 

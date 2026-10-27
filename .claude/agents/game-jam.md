@@ -22,7 +22,7 @@ Si no recibes un tema, pídelo y no hagas nada más. Responde siempre en españo
 ## 2. Elegir los 3 juegos
 
 - Los tres encajan con el tema y son **distintos entre sí** (mecánica y, si es posible, categoría).
-- Slug en español, kebab-case, **nuevo**: no puede coincidir con un `games.id` existente (`asteroides`, `caida`, `bloque-buster`, `serpentina`, `gloton`, `invasores`, `ranaria`, `duelo-pixel`) ni con una carpeta ya presente en `specs/game-jam/`.
+- Slug en español, kebab-case, **nuevo**: no puede coincidir con un `games.id` existente (`asteroides`, `caida`, `bloque-buster`, `serpentina`, `gloton`, `invasores`, `frogger`, `duelo-pixel`) ni con una carpeta ya presente en `specs/game-jam/`.
 - Nombre propio sin marcas registradas.
 - Descarta: multijugador en red, backend, audio obligatorio, controles que no sean de teclado (el ratón es opcional) y juegos que no terminen en un game over con puntuación creciente.
 - Esfuerzo S o M con la arquitectura actual: un motor, un canvas, sin tablas nuevas. Cada juego requiere una fila nueva en `games` (migración) porque aún no existe.

@@ -32,24 +32,25 @@ Subagents live in `.claude/agents/`:
 
 - `game-planner` — suggests which game to add next; keeps its memory in `.claude/agent-memory/game-planner/` (committed) and maintains `references/geme-suggestions-todo.md`. Never writes code.
 - `game-jam` — receives a THEME and writes specs (never code) for new arcade games in `specs/game-jam/<game-id>/` (`01-diseno-juego.md`, `02-motor-y-canvas.md`), all in `Draft` for review before `/spec-impl`. It can also be asked for a single game, e.g. `invasores` (specs written, not implemented).
-- `skin-designer` — takes a game slug (or "todos") and makes sure it has at least 3 skins: `clasico` (default, current look), `neon` and `retro`, all readable on dark backgrounds. For implemented games it edits the engine/canvas/`GamePlayer` (skin passed to the engine as data, selector in the UI, `localStorage` key `av_skin_<slug>`) and runs lint/build; for specified-only games it only writes the report. Reports go in `specs/skins/<game-id>.md`. No game has skins yet (TETRIS is the first to migrate); it does not edit `CLAUDE.md` or commit.
+- `skin-designer` — takes a game slug (or "todos") and makes sure it has at least 3 skins: `clasico` (default, current look), `neon` and `retro`, all readable on dark backgrounds. For implemented games it edits the engine/canvas/`GamePlayer` (skin passed to the engine as data, selector in the UI, `localStorage` key `av_skin_<slug>`) and runs lint/build; for specified-only games it only writes the report. Reports go in `specs/skins/<game-id>.md`. All 5 real games already have skins (`lib/games/<game>/skins.ts`, registered in `SKIN_GAMES` in `components/game-canvases.tsx`); it does not edit `CLAUDE.md` or commit.
 - `mobile-porter` — takes a game slug (or "todos") and checks that its controls work on web (keyboard/mouse) and mobile (virtual gamepad) following SPEC 10: engine `setInput`, canvas `inputRef`, `TOUCH_LAYOUTS`, `TouchControls` and the player CSS. It fixes small gaps in that code, runs lint/build and writes reports in `specs/mobile/<game-id>.md`. It has no browser, so it never tests on a device; it does not edit `CLAUDE.md` or commit.
 
 ## Specs done
 
-| #   | Spec                            | Result                                                               |
-| --- | ------------------------------- | -------------------------------------------------------------------- |
-| 01  | `mvp-pantallas`                 | Prototype screens ported to the App Router (visual MVP, mocked data) |
-| 02  | `home-inicio`                   | Landing at `/`; library moved to `/biblioteca`                       |
-| 03  | `acerca-de-contacto`            | `/acerca` with a contact form that sends email via Resend            |
-| 04  | `conexion-supabase`             | Supabase clients + health check                                      |
-| 05  | `juego-rocas-asteroids`         | `asteroides`, first real game                                        |
-| 06  | `leaderboard-y-tabla-de-juegos` | `games` and `scores` tables; catalog and `/salon` read from Supabase |
-| 07  | `juego-caida-tetris`            | `caida` (TETRIS) + engine registry                                   |
-| 08  | `juego-bloque-buster-arkanoid`  | `bloque-buster` (ARKANOID)                                           |
-| 09  | `juego-snake`                   | `serpentina` (SNAKE)                                                 |
-| 10  | `controles-tactiles-movil`      | Virtual gamepad for the 4 real games on touch devices                |
-| 11  | `gamepad-estilo-neon`           | Gamepad restyled as the neon "MK-II" pad (shell, 3D D-pad, A/B)      |
+| #   | Spec                               | Result                                                                 |
+| --- | ---------------------------------- | ---------------------------------------------------------------------- |
+| 01  | `mvp-pantallas`                    | Prototype screens ported to the App Router (visual MVP, mocked data)   |
+| 02  | `home-inicio`                      | Landing at `/`; library moved to `/biblioteca`                         |
+| 03  | `acerca-de-contacto`               | `/acerca` with a contact form that sends email via Resend              |
+| 04  | `conexion-supabase`                | Supabase clients + health check                                        |
+| 05  | `juego-rocas-asteroids`            | `asteroides`, first real game                                          |
+| 06  | `leaderboard-y-tabla-de-juegos`    | `games` and `scores` tables; catalog and `/salon` read from Supabase   |
+| 07  | `juego-caida-tetris`               | `caida` (TETRIS) + engine registry                                     |
+| 08  | `juego-bloque-buster-arkanoid`     | `bloque-buster` (ARKANOID)                                             |
+| 09  | `juego-snake`                      | `serpentina` (SNAKE)                                                   |
+| 10  | `controles-tactiles-movil`         | Virtual gamepad for the 4 real games on touch devices                  |
+| 11  | `gamepad-estilo-neon`              | Gamepad restyled as the neon "MK-II" pad (shell, 3D D-pad, A/B)        |
+| jam | `game-jam/frogger/01-frogger-core` | `frogger` (FROGGER), replaces the `ranaria` placeholder; skins + touch |
 
 ## Routes
 
@@ -89,7 +90,7 @@ API (Route Handlers in `app/api/`):
   - `scores` — `id` uuid, `game_id` → `games.id`, `player_name` (1–10 chars, trimmed and uppercased), `score` (1–9 999 999), `created_at`. No `user_id`. Ranking: `score` desc, then `created_at` asc.
 - Pages read through `lib/data/*` with the server client (dynamic because of `cookies()`, no `generateStaticParams`). If Supabase fails, catalog pages throw; there is no mock fallback.
 - No rate limiting on score posts until auth lands. The advisor warnings about `public.rls_auto_enable()` predate SPEC 06 and are left alone.
-- Migrations in `supabase/migrations/`: `games_y_scores` (tables + seed of 8 games), and three title renames (`caida` → TETRIS, `bloque-buster` → ARKANOID, `serpentina` → SNAKE, which also fixes its `long`). Slugs never change. Every migration is committed to git.
+- Migrations in `supabase/migrations/`: `games_y_scores` (tables + seed of 8 games), three title renames (`caida` → TETRIS, `bloque-buster` → ARKANOID, `serpentina` → SNAKE, which also fixes its `long`), and `frogger` (insert) + `frogger_reemplaza_ranaria` (drops the `ranaria` placeholder, no scores). Slugs never change. Every migration is committed to git.
 - The Supabase MCP server is configured in `.mcp.json`.
 
 ## Environment
@@ -98,7 +99,7 @@ API (Route Handlers in `app/api/`):
 
 ## Games
 
-Catalog (8 games): `asteroides`, `caida`, `bloque-buster`, `serpentina` are playable, see references/imeplemented-games when you need to check for which games are implemented; `gloton`, `invasores`, `ranaria`, `duelo-pixel` still produce a simulated score in `.game-arena`. All eight save scores through `POST /api/puntuaciones`.
+Catalog (8 games): `asteroides`, `caida`, `bloque-buster`, `serpentina`, `frogger` are playable, see references/imeplemented-games when you need to check for which games are implemented; `gloton`, `invasores`, `duelo-pixel` still produce a simulated score in `.game-arena`. All eight save scores through `POST /api/puntuaciones`.
 
 Architecture shared by every real game:
 
@@ -108,12 +109,13 @@ Architecture shared by every real game:
 - Every engine also returns `setInput(code, pressed)` (same logic as its keyboard handler, which keeps working). Releasing is always accepted; pressing is ignored while paused, over or stopped. Canvas components fill `EngineProps.inputRef` with the engine and clear it on unmount. New games must implement `setInput` and add an entry to `TOUCH_LAYOUTS`.
 - New games: follow `/add-game`. Reference sources are in `references/started-games/` and `references/source-assets/` (never imported).
 
-| Slug (title)               | Engine files                                                                                                                              | Canvas                                      | Controls                                           | Rules                                                                                                                                |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `asteroides` (ASTEROIDES)  | `lib/games/asteroids/entities.ts` (Bullet, Asteroid, PowerUp, Ship, Particle), `engine.ts`                                                | 800×600                                     | ←/→ rotate, ↑ thrust, Space fire                   | Lives + levels                                                                                                                       |
-| `caida` (TETRIS)           | `lib/games/tetris/pieces.ts` (10×20 board, 8 pieces incl. "N", `LINE_SCORES`, `KICKS`, `rotateCW`, `collide`, `createBoard`), `engine.ts` | 420×600 (300×600 board + next-piece column) | ←/→ move, ↓ soft drop, ↑/X rotate, Space hard drop | No lives; `onStats({ score, level, lines })`                                                                                         |
-| `bloque-buster` (ARKANOID) | `lib/games/arkanoid/levels.ts` (5 levels), `sprites.ts` (`loadSpritesheet()`), `engine.ts`                                                | 800×600                                     | ←/→ or mouse                                       | 3 lives, +10 per block; loop starts after the spritesheet loads; losing or clearing level 5 ends the game                            |
-| `serpentina` (SNAKE)       | `lib/games/snake/fruits.ts` (22 sprites, `loadFruits()`), `engine.ts`                                                                     | 640×480 (16×12 cells of 40 px)              | Arrows / WASD                                      | Fixed step 0.125 s, +10 per fruit, dies on wall/body, turn queue of 2, filling the grid wins; magenta fallback while the atlas loads |
+| Slug (title)               | Engine files                                                                                                                              | Canvas                                      | Controls                                           | Rules                                                                                                                                                                                    |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `asteroides` (ASTEROIDES)  | `lib/games/asteroids/entities.ts` (Bullet, Asteroid, PowerUp, Ship, Particle), `engine.ts`                                                | 800×600                                     | ←/→ rotate, ↑ thrust, Space fire                   | Lives + levels                                                                                                                                                                           |
+| `caida` (TETRIS)           | `lib/games/tetris/pieces.ts` (10×20 board, 8 pieces incl. "N", `LINE_SCORES`, `KICKS`, `rotateCW`, `collide`, `createBoard`), `engine.ts` | 420×600 (300×600 board + next-piece column) | ←/→ move, ↓ soft drop, ↑/X rotate, Space hard drop | No lives; `onStats({ score, level, lines })`                                                                                                                                             |
+| `bloque-buster` (ARKANOID) | `lib/games/arkanoid/levels.ts` (5 levels), `sprites.ts` (`loadSpritesheet()`), `engine.ts`                                                | 800×600                                     | ←/→ or mouse                                       | 3 lives, +10 per block; loop starts after the spritesheet loads; losing or clearing level 5 ends the game                                                                                |
+| `serpentina` (SNAKE)       | `lib/games/snake/fruits.ts` (22 sprites, `loadFruits()`), `engine.ts`                                                                     | 640×480 (16×12 cells of 40 px)              | Arrows / WASD                                      | Fixed step 0.125 s, +10 per fruit, dies on wall/body, turn queue of 2, filling the grid wins; magenta fallback while the atlas loads                                                     |
+| `frogger` (FROGGER)        | `lib/games/frogger/model.ts` (16×14 grid, zones, types), `lanes.ts` (`buildLanes(level)`), `collision.ts`, `skins.ts`, `engine.ts`        | 640×560 (16×14 cells of 40 px)              | Arrows (hop of 1 cell, 120 ms)                     | 3 lives, 15 s per round (−1 s/level, min 8 s), 5 goal mouths, +10 per new row, +50 per mouth + time bonus, +200 per round; road vehicles at half speed; the canvas draws only a time bar |
 
 Assets: `public/games/bloque-buster/spritesheet-breakout.png`, `public/games/serpentina/fruits.png`.
 

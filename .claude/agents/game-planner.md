@@ -29,7 +29,7 @@ Evalúa cada candidato (1–5 por criterio) y muestra la tabla:
 - **Controles**: jugable solo con teclado (ratón opcional), sin conflicto con escribir en `<input>`.
 - **Rejugabilidad**: partidas cortas (1–10 min), ganas de «una más».
 - **Esfuerzo**: S/M/L con la arquitectura actual (un motor + un canvas, sin backend nuevo ni tablas nuevas).
-- **Catálogo**: prioridad a los slugs ya existentes y aún simulados (`gloton`, `invasores`, `ranaria`, `duelo-pixel` mientras sigan así), y equilibrio entre categorías (ARCADE, PUZZLE, SHOOTER, VERSUS).
+- **Catálogo**: prioridad a los slugs ya existentes y aún simulados (`gloton`, `invasores`, `duelo-pixel` mientras sigan así), y equilibrio entre categorías (ARCADE, PUZZLE, SHOOTER, VERSUS).
 - **Assets**: si existen en `references/` o se pueden dibujar con primitivas.
 
 Descarta de entrada: multijugador en red, juegos que necesiten backend, audio obligatorio, o marcas registradas como título (usa nombres propios en español, como el resto del catálogo).

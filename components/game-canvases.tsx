@@ -36,4 +36,5 @@ export const SKIN_GAMES: ReadonlySet<string> = new Set([
   "bloque-buster",
   "serpentina",
   "asteroides",
+  "frogger",
 ]);
