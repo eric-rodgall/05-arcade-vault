@@ -32,7 +32,7 @@ Todos deben verse bien en **modo oscuro** (el sitio es oscuro): el fondo del can
 ## 3. Alcance
 
 - **Implementados** (`asteroides`, `caida`, `bloque-buster`, `serpentina` y los que se añadan): implementa los skins.
-- **Solo especificados o simulados** (`gloton`, `invasores`, `ranaria`, `duelo-pixel`…): no hay código que tocar. Escribe solo el informe con las paletas y los pasos a añadir a su spec; no inventes un motor.
+- **Solo especificados o simulados** (`gloton`, `invasores`, `duelo-pixel`…): no hay código que tocar. Escribe solo el informe con las paletas y los pasos a añadir a su spec; no inventes un motor.
 
 ## 4. Patrón de implementación
 

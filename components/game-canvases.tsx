@@ -1,6 +1,7 @@
 import type { ComponentType, RefObject } from "react";
 import { ArkanoidCanvas } from "@/components/arkanoid-canvas";
 import { AsteroidsCanvas } from "@/components/asteroids-canvas";
+import { FroggerCanvas } from "@/components/frogger-canvas";
 import { SnakeCanvas } from "@/components/snake-canvas";
 import { TetrisCanvas } from "@/components/tetris-canvas";
 import type { GameInputSink } from "@/lib/games/input";
@@ -26,6 +27,7 @@ export const GAME_ENGINES: Record<string, ComponentType<EngineProps>> = {
   caida: TetrisCanvas,
   "bloque-buster": ArkanoidCanvas,
   serpentina: SnakeCanvas,
+  frogger: FroggerCanvas,
 };
 
 // Juegos cuyo motor soporta skins (el selector de GamePlayer solo aparece para ellos).
@@ -34,4 +36,5 @@ export const SKIN_GAMES: ReadonlySet<string> = new Set([
   "bloque-buster",
   "serpentina",
   "asteroides",
+  "frogger",
 ]);
