@@ -1,10 +1,6 @@
 import {
   CELL,
   COLS,
-  ROW_RIVER_BOT,
-  ROW_RIVER_TOP,
-  ROW_ROAD_BOT,
-  ROW_ROAD_TOP,
   SPEED_PER_LEVEL,
   TURTLE_SUBMERGED_MS,
   TURTLE_VISIBLE_MS,
@@ -195,8 +191,3 @@ export function buildLanes(level: number): Lane[] {
 export function cellsPerMs(lane: Lane): number {
   return (lane.speed / CELL / 16) * lane.dir;
 }
-
-export const isRoadRow = (row: number) =>
-  row >= ROW_ROAD_TOP && row <= ROW_ROAD_BOT;
-export const isRiverRow = (row: number) =>
-  row >= ROW_RIVER_TOP && row <= ROW_RIVER_BOT;

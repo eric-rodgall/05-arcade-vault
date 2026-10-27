@@ -1,3 +1,9 @@
+import {
+  checkRoadCollision,
+  getSupport,
+  goalIndexAt,
+  isRiverRow,
+} from "./collision";
 import { buildLanes, cellsPerMs } from "./lanes";
 import {
   CELL,
@@ -68,7 +74,7 @@ export function createFroggerGame(
 
   const level = 1;
   const lives = START_LIVES;
-  const score = 0;
+  let score = 0;
   let lanes: Lane[] = buildLanes(level);
   let goals: boolean[] = Array<boolean>(GOAL_COUNT).fill(false); // bocas ocupadas
   let frog: Frog = newFrog();
@@ -76,6 +82,10 @@ export function createFroggerGame(
   let fromRow = frog.row;
   let facing: Direction = "up";
   let pendingDir: Direction | null = null;
+  let farthestRow = ROW_START; // fila más alta alcanzada en esta vida
+  const GOAL_POINTS = 50;
+  const ADVANCE_POINTS = 10;
+  const TIME_BONUS_PER_SECOND = 10;
   let timeLeft = ROUND_SECONDS * 1000; // ms
   const timeTotal = timeLeft;
   const over = false;
@@ -163,23 +173,68 @@ export function createFroggerGame(
     resolveLanding();
   }
 
-  // Paso 5: muerte por vehículo/agua, bocas destino y puntuación por avance.
-  function resolveLanding() {}
-
-  // Paso 5: la rana viaja con el tronco o las tortugas sobre las que descansa.
-  function carryFrog() {}
-
-  // Paso 7: restar vida, reiniciar posición/temporizador y fin de partida.
-  function killFrog() {
+  function respawn() {
     frog = newFrog();
+    fromCol = frog.col;
+    fromRow = frog.row;
+    facing = "up";
     pendingDir = null;
+    farthestRow = ROW_START;
     timeLeft = timeTotal;
+  }
+
+  function resolveLanding() {
+    if (frog.row < farthestRow) {
+      score += (farthestRow - frog.row) * ADVANCE_POINTS;
+      farthestRow = frog.row;
+    }
+    if (frog.row === ROW_GOALS) {
+      const mouth = goalIndexAt(frog.col);
+      if (mouth < 0 || goals[mouth]) {
+        killFrog(); // muro entre bocas o boca ya ocupada
+        return;
+      }
+      goals[mouth] = true;
+      score +=
+        GOAL_POINTS + Math.floor(timeLeft / 1000) * TIME_BONUS_PER_SECOND;
+      if (goals.every(Boolean)) completeRound();
+      else respawn();
+    } else if (isRiverRow(frog.row) && !getSupport(frog, lanes)) {
+      killFrog(); // cayó al agua
+    }
+  }
+
+  // La rana viaja con el tronco o las tortugas sobre las que descansa.
+  function carryFrog(dt: number) {
+    if (checkRoadCollision(frog, lanes)) {
+      killFrog();
+      return;
+    }
+    if (!isRiverRow(frog.row)) return;
+    const support = getSupport(frog, lanes);
+    if (!support) {
+      killFrog(); // tortuga sumergida bajo la rana
+      return;
+    }
+    frog.col += cellsPerMs(support.lane) * dt;
+    if (frog.col < -0.5 || frog.col > COLS - 0.5) killFrog(); // arrastrada fuera del río
+  }
+
+  // Paso 6: sumar la ronda, subir de nivel y reconstruir carriles.
+  function completeRound() {
+    respawn();
+  }
+
+  // Paso 7: restar vida y fin de partida.
+  function killFrog() {
+    respawn();
   }
 
   function update(dt: number) {
     moveEntities(dt);
     updateFrog(dt);
-    if (!frog.animating) carryFrog();
+    if (!frog.animating) carryFrog(dt);
+    else if (checkRoadCollision(frog, lanes)) killFrog();
     timeLeft -= dt;
     if (timeLeft <= 0) killFrog();
     emitStats();
