@@ -21,6 +21,9 @@ interface LaneDef {
   segments: Segment[];
 }
 
+// Los vehículos van más despacio que lo que sugerían las velocidades base del spec.
+const ROAD_SPEED_FACTOR = 0.5;
+
 const ROAD: LaneDef[] = [
   {
     row: 8,
@@ -175,7 +178,10 @@ function buildLane(def: LaneDef, level: number, laneIndex: number): Lane {
   const span = Math.max(col, COLS + maxWidth);
   return {
     row: def.row,
-    speed: def.speed * SPEED_PER_LEVEL ** (level - 1),
+    speed:
+      def.speed *
+      (def.type === "car" || def.type === "truck" ? ROAD_SPEED_FACTOR : 1) *
+      SPEED_PER_LEVEL ** (level - 1),
     dir: def.dir,
     span,
     entities,

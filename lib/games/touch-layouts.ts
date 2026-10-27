@@ -41,4 +41,8 @@ export const TOUCH_LAYOUTS: Record<string, TouchLayout> = {
     dpad: [LEFT, RIGHT, UP, DOWN],
     actions: [],
   },
+  frogger: {
+    dpad: [LEFT, RIGHT, UP, DOWN],
+    actions: [],
+  },
 };
