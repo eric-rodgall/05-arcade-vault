@@ -73,7 +73,7 @@ export function createFroggerGame(
   const ctx = canvas.getContext("2d")!;
 
   let level = 1;
-  const lives = START_LIVES;
+  let lives = START_LIVES;
   let score = 0;
   let lanes: Lane[] = buildLanes(level);
   let goals: boolean[] = Array<boolean>(GOAL_COUNT).fill(false); // bocas ocupadas
@@ -89,7 +89,7 @@ export function createFroggerGame(
   const TIME_BONUS_PER_SECOND = 10;
   let timeLeft = roundSeconds(level) * 1000; // ms
   let timeTotal = timeLeft;
-  const over = false;
+  let over = false;
   let paused = false;
   let stopped = false;
 
@@ -230,9 +230,17 @@ export function createFroggerGame(
     respawn();
   }
 
-  // Paso 7: restar vida y fin de partida.
   function killFrog() {
-    respawn();
+    if (over) return;
+    lives -= 1;
+    if (lives > 0) {
+      respawn();
+      return;
+    }
+    over = true;
+    pendingDir = null;
+    emitStats(); // vidas = 0 antes de avisar del fin de partida
+    callbacks.onGameOver(score);
   }
 
   function update(dt: number) {
